@@ -1,0 +1,16 @@
+[package]
+name = "Klash"
+version = "1.0.0"
+
+[addresses]
+klash = "0xf91de408f7f59f661f28aa2ebbb086bba63a846856954191877d6f8768e8f138"
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+rev = "mainnet"
+subdir = "aptos-move/framework/aptos-framework"
+
+[dependencies.AptosStdlib]
+git = "https://github.com/aptos-labs/aptos-core.git"
+rev = "mainnet"
+subdir = "aptos-move/framework/aptos-stdlib"
