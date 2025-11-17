@@ -1,12 +1,41 @@
 // API Configuration for Klash Backend
 export const API_CONFIG = {
-  // Backend server URL - change to your backend URL
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
-  // API prefix
+  // Backend server URL - automatically detects environment
+  BASE_URL: import.meta.env.VITE_API_URL || getApiUrl(),
   API_PREFIX: '/api',
   // WebSocket URL for real-time updates
-  WS_URL: import.meta.env.VITE_WS_URL || 'ws://localhost:3000',
+  WS_URL: import.meta.env.VITE_WS_URL || getWsUrl(),
 };
+
+// Helper function to determine API URL based on environment
+function getApiUrl(): string {
+  const isDev = import.meta.env.DEV;
+  const isProd = import.meta.env.PROD;
+  
+  if (isDev) {
+    return 'http://localhost:3000';
+  } else if (isProd) {
+    // For production, use the environment variable or fallback
+    return import.meta.env.VITE_API_URL || 'https://api.klash.app';
+  }
+  
+  return 'http://localhost:3000';
+}
+
+// Helper function to determine WebSocket URL
+function getWsUrl(): string {
+  const isDev = import.meta.env.DEV;
+  const isProd = import.meta.env.PROD;
+  
+  if (isDev) {
+    return 'ws://localhost:3000';
+  } else if (isProd) {
+    // For production, use the environment variable or fallback
+    return import.meta.env.VITE_WS_URL || 'wss://api.klash.app';
+  }
+  
+  return 'ws://localhost:3000';
+}
 
 // Helper function to build API URLs
 export const buildApiUrl = (endpoint: string) => {

@@ -19,6 +19,15 @@ class EnvironmentVariables {
 
   @IsString()
   TWITTER_API_BASE_URL: string;
+
+  @IsString()
+  TWITTER_USER_ID: string;
+
+  @IsString()
+  TWITTER_IO_API_KEY: string;
+
+  @IsString()
+  TWITTER_IO_USER_ID: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

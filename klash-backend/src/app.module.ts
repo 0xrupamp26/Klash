@@ -8,6 +8,11 @@ import { AppService } from './app.service';
 import { TwitterModule } from './twitter/twitter.module';
 import { TwitterControversyModule } from './twitter/twitter-controversy.module';
 import { AptosModule } from './aptos/aptos.module';
+import { MarketsModule } from './markets/markets.module';
+import { CrawlerModule } from './crawler/crawler.module';
+import { TwitterIOModule } from './twitterio/twitterio.module';
+import { ControversyModule } from './controversy/controversy.module';
+import { MarketCreatorModule } from './market-creator/market-creator.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -28,6 +33,11 @@ import configuration from './config/configuration';
     TwitterModule,
     TwitterControversyModule,
     AptosModule,
+    MarketsModule,
+    CrawlerModule,
+    TwitterIOModule,
+    ControversyModule,
+    MarketCreatorModule,
   ],
   controllers: [AppController],
   providers: [

@@ -8,6 +8,7 @@ import {
   ValidationPipe, 
   HttpStatus,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { 
   ApiTags, 
@@ -20,11 +21,6 @@ import {
 import { TwitterService } from './twitter.service';
 import { SearchTweetsDto } from './dto/search-tweets.dto';
 import { GetUserDto } from './dto/get-user.dto';
-import { 
-  SentimentResult, 
-  TeamClassificationResult, 
-  MarketResolutionResult 
-} from './twitter.service';
 
 @ApiTags('Twitter')
 @Controller('twitter')
@@ -60,6 +56,8 @@ export class TwitterController {
     return this.twitterService.getTrendingTopics();
   }
 
+  // TODO: Implement these methods when TwitterService is fully implemented
+  /*
   @Post('analyze-sentiment')
   @ApiOperation({ summary: 'Analyze sentiment of tweets using Hugging Face model' })
   @ApiBody({ 
@@ -91,7 +89,10 @@ export class TwitterController {
       throw error;
     }
   }
+  */
 
+  // TODO: Implement these methods when TwitterService is fully implemented
+  /*
   @Post('classify-teams')
   @ApiOperation({ summary: 'Classify tweets into teams based on a controversy' })
   @ApiBody({
@@ -132,7 +133,10 @@ export class TwitterController {
       throw error;
     }
   }
+  */
 
+  // TODO: Implement this method when TwitterService is fully implemented
+  /*
   @Post('resolve/:marketId')
   @ApiOperation({ summary: 'Resolve a prediction market' })
   @ApiParam({ 
@@ -142,10 +146,16 @@ export class TwitterController {
   @ApiResponse({ 
     status: 201, 
     description: 'Returns market resolution results',
-    type: MarketResolutionResult
+    schema: {
+      type: 'object',
+      properties: {
+        marketId: { type: 'string', description: 'Market ID' },
+        resolution: { type: 'string', description: 'Resolution result' },
+        confidence: { type: 'number', description: 'Confidence score' }
+      }
+    }
   })
   @ApiResponse({ status: 404, description: 'Market not found' })
-  @ApiResponse({ status: 400, description: 'Market already resolved' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async resolveMarket(
     @Param('marketId') marketId: string,
@@ -157,7 +167,10 @@ export class TwitterController {
       throw error;
     }
   }
+  */
 
+  // TODO: Implement these methods when TwitterService is fully implemented
+  /*
   @Post('auto-resolve-markets')
   @ApiOperation({ 
     summary: 'Trigger resolution of all expired markets',
@@ -188,4 +201,5 @@ export class TwitterController {
       throw error;
     }
   }
+  */
 }

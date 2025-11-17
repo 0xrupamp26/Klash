@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { PythonShell } from 'python-shell';
 import * as path from 'path';
 import { TwitterService } from '../twitter/twitter.service';
+import { TwitterIOService } from '../twitterio/twitterio.service';
 import { AllocationService } from '../allocation/allocation.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
@@ -17,6 +18,7 @@ export class ResolutionService implements OnModuleInit {
     @InjectModel('Bet') private betModel: any,
     @InjectModel('TweetAnalysis') private tweetAnalysisModel: any,
     private readonly twitterService: TwitterService,
+    private readonly twitterIOService: TwitterIOService,
     private readonly allocationService: AllocationService,
   ) {}
 
@@ -61,7 +63,7 @@ export class ResolutionService implements OnModuleInit {
         winningOutcome: outcome,
         resolutionTime,
         resolutionData: {
-          method,
+          method: method as 'TEAM_CLASSIFICATION' | 'SENTIMENT' | 'HYBRID' | 'MANUAL',
           confidence,
           sentimentScore: analysis.sentimentResults.avgPolarity,
           teamASupport: analysis.teamResults.teamASupport,
@@ -78,14 +80,13 @@ export class ResolutionService implements OnModuleInit {
       await this.allocationService.resolveMarket(
         marketId,
         outcome,
-        resolutionTime.getTime(),
       );
 
       return {
         marketId,
         winningOutcome: outcome,
         confidence,
-        method,
+        method: method as 'TEAM_CLASSIFICATION' | 'SENTIMENT' | 'HYBRID' | 'MANUAL',
         sentimentData: {
           avgPolarity: analysis.sentimentResults.avgPolarity,
           avgConfidence: analysis.sentimentResults.avgConfidence,
@@ -172,22 +173,22 @@ export class ResolutionService implements OnModuleInit {
     question: string,
     outcomes: string[],
   ): Promise<AnalysisData> {
-    // 1. Fetch replies
-    const replies = await this.twitterService.getTweetReplies(tweetId, 200);
+    // 1. Fetch replies - using TwitterIO service instead
+    const tweetResponse = await this.twitterIOService.getTweetReplies(tweetId);
+    const replies = tweetResponse.data || [];
     
     // 2. Filter and prepare data
     const validReplies = replies
       .filter(reply => 
         reply.text.length >= 10 && // Minimum length
-        !reply.isRetweet && // No retweets
-        reply.user.followersCount > 10 // Minimum followers
+        reply.engagement.replies > 0 // Has engagement
       )
       .map(reply => ({
         id: reply.id,
         text: reply.text,
-        author: reply.user.screenName,
-        followers: reply.user.followersCount,
-        createdAt: reply.createdAt,
+        author: reply.author,
+        postedAt: reply.postedAt,
+        followersCount: reply.engagement.likes, // Using likes as proxy for followers
       }));
 
     if (validReplies.length < 50) {
@@ -218,7 +219,7 @@ export class ResolutionService implements OnModuleInit {
       teamClassification: teamResults.labels[i],
       classificationConfidence: teamResults.confidences[i],
       authorMetrics: {
-        followers: reply.followers,
+        followers: reply.followersCount,
         verified: false, // Add verification status if available
       },
       analyzedAt: new Date(),
@@ -418,7 +419,6 @@ export class ResolutionService implements OnModuleInit {
     await this.allocationService.resolveMarket(
       marketId,
       outcome,
-      Date.now(),
     );
   }
 }

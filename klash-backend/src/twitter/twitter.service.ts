@@ -1,10 +1,9 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { firstValueFrom } from 'rxjs';
-import { AxiosError } from 'axios';
 import * as PythonShell from 'python-shell';
 import { join } from 'path';
 import { 
@@ -76,7 +75,7 @@ export class TwitterService {
     this.logger.error(`Twitter API error in ${context}:`, error);
 
     if (error.isAxiosError) {
-      const axiosError = error as AxiosError;
+      const axiosError = error;
       
       if (axiosError.response) {
         const { status, data } = axiosError.response;

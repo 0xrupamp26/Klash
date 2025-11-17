@@ -1,72 +1,82 @@
-import { Injectable } from '@nestjs/common';
-import { AptosClient, AptosAccount } from 'aptos';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
+declare const require: any;
+const aptos = require('aptos');
 
 @Injectable()
 export class AllocationService {
-  private readonly PLATFORM_FEE_BPS: number = 200;
-  private readonly BPS_DENOMINATOR: number = 10000;
-  private readonly client: AptosClient;
+  private readonly logger = new Logger(AllocationService.name);
+  private readonly aptosClient: any;
+  private readonly adminAccount: any;
   private readonly moduleAddress: string;
-  private readonly privateKey: Uint8Array;
 
   constructor(private configService: ConfigService) {
-    this.client = new AptosClient(this.configService.get('APTOS_NODE_URL'));
-    this.moduleAddress = this.configService.get('KLASH_MODULE_ADDRESS');
-    this.privateKey = new Uint8Array(
-      JSON.parse(this.configService.get('PRIVATE_KEY'))
+    const nodeUrl = this.configService.get<string>('APTOS_NODE_URL') || 'https://fullnode.testnet.aptoslabs.com';
+    this.aptosClient = new aptos.AptosClient(nodeUrl);
+    
+    this.moduleAddress = this.configService.get<string>('KLASH_MODULE_ADDRESS') || '';
+    const privateKey = this.configService.get<string>('PRIVATE_KEY') || '';
+    
+    if (!this.moduleAddress || !privateKey) {
+      this.logger.error('Missing required configuration for Aptos module');
+      throw new Error('KLASH_MODULE_ADDRESS and PRIVATE_KEY must be provided');
+    }
+    
+    this.adminAccount = new aptos.AptosAccount(
+      new Uint8Array(Buffer.from(privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey, 'hex'))
     );
   }
 
   async resolveMarket(marketId: string, winningOutcome: number): Promise<string> {
-    const account = AptosAccount.fromPrivateKey(this.privateKey);
-    
-    const payload = {
-      type: 'entry_function_payload',
-      function: `${this.moduleAddress}::allocation::resolve_and_allocate`,
-      type_arguments: [],
-      arguments: [
-        Buffer.from(marketId).toString('hex'),
-        winningOutcome
-      ],
-    };
+    try {
+      const payload = {
+        type: 'entry_function_payload',
+        function: `${this.moduleAddress}::market::resolve_market`,
+        type_arguments: [],
+        arguments: [
+          marketId,
+          winningOutcome.toString()
+        ],
+      };
 
-    const txnHash = await this.client.generateSignSubmitTransaction(
-      account,
-      payload
-    );
-    await this.client.waitForTransaction(txnHash);
-    return txnHash;
+      const rawTxn = await this.aptosClient.generateTransaction(this.adminAccount.address(), payload);
+      const signedTxn = await this.aptosClient.signTransaction(this.adminAccount, rawTxn);
+      const transactionRes = await this.aptosClient.submitTransaction(signedTxn);
+
+      await this.aptosClient.waitForTransaction(transactionRes.hash);
+
+      this.logger.log(`Market resolved successfully: ${marketId}`);
+      return transactionRes.hash;
+    } catch (error) {
+      this.logger.error('Error resolving market:', error);
+      throw new Error(`Failed to resolve market: ${error.message}`);
+    }
   }
 
   async claimPayout(userAddress: string, marketId: string): Promise<string> {
-    const account = AptosAccount.fromPrivateKey(this.privateKey);
-    
-    const payload = {
-      type: 'entry_function_payload',
-      function: `${this.moduleAddress}::allocation::claim_payout`,
-      type_arguments: [],
-      arguments: [
-        userAddress,
-        Buffer.from(marketId).toString('hex')
-      ],
-    };
+    try {
+      const payload = {
+        type: 'entry_function_payload',
+        function: `${this.moduleAddress}::market::claim_payout`,
+        type_arguments: [],
+        arguments: [
+          userAddress,
+          marketId
+        ],
+      };
 
-    const txnHash = await this.client.generateSignSubmitTransaction(
-      account,
-      payload
-    );
-    await this.client.waitForTransaction(txnHash);
-    return txnHash;
-  }
+      const rawTxn = await this.aptosClient.generateTransaction(this.adminAccount.address(), payload);
+      const signedTxn = await this.aptosClient.signTransaction(this.adminAccount, rawTxn);
+      const transactionRes = await this.aptosClient.submitTransaction(signedTxn);
 
-  calculatePayout(betAmount: number, winningPool: number, losingPool: number): number {
-    if (winningPool === 0) return 0;
-    
-    const feeAmount = (losingPool * this.PLATFORM_FEE_BPS) / this.BPS_DENOMINATOR;
-    const remainingPool = losingPool - feeAmount;
-    const userShare = (betAmount * remainingPool) / winningPool;
-    
-    return betAmount + userShare;
+      await this.aptosClient.waitForTransaction(transactionRes.hash);
+
+      this.logger.log(`Payout claimed successfully for user ${userAddress} in market ${marketId}`);
+      return transactionRes.hash;
+    } catch (error) {
+      this.logger.error('Error claiming payout:', error);
+      throw new Error(`Failed to claim payout: ${error.message}`);
+    }
   }
 }

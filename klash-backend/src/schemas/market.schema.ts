@@ -83,6 +83,39 @@ export class Market {
 
   @Prop()
   resolutionError: string;
+
+  @Prop({ 
+    required: true, 
+    default: 'twitter-lafdaAI', 
+    enum: ['twitter-lafdaAI', 'admin', 'user', 'manual'] 
+  })
+  source: string;
+
+  @Prop({ type: Object })
+  tweetData: {
+    tweetId: string;
+    tweetUrl: string;
+    author: string;
+    postedAt: Date;
+    engagement: {
+      likes: number;
+      retweets: number;
+      replies: number;
+    };
+    videoUrl?: string;
+  };
+
+  @Prop({ default: 0 })
+  engagementScore: number;
+
+  @Prop({ type: Object })
+  sentimentTracking: {
+    positiveSentiment: number;
+    negativeSentiment: number;
+    neutralSentiment: number;
+    lastUpdated: Date;
+    sampleSize: number;
+  };
 }
 
 export const MarketSchema = SchemaFactory.createForClass(Market);
