@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 72% 51%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 0 72% 51%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 72% 51%;
+
+    --radius: 0.5rem;
+    
+    --klash-red: 0 72% 51%;
+    --klash-red-dark: 0 64% 35%;
+    --klash-red-glow: 0 72% 61%;
+    --klash-bg: 0 0% 4%;
+    --klash-surface: 0 0% 8%;
+    
+    --gradient-red: linear-gradient(135deg, hsl(0 72% 51%), hsl(0 64% 35%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 6%), hsl(0 0% 4%));
+    --gradient-intense: linear-gradient(135deg, hsl(0 72% 51% / 0.4), hsl(0 64% 35% / 0.1));
+    
+    --shadow-glow: 0 0 40px hsl(0 72% 51% / 0.3);
+    --shadow-glow-intense: 0 0 60px hsl(0 72% 51% / 0.5), 0 0 100px hsl(0 72% 51% / 0.3);
+    --shadow-card: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
+    --shadow-card-hover: 0 20px 50px -10px hsl(0 72% 51% / 0.2), 0 10px 30px -10px hsl(0 0% 0% / 0.7);
+    
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    background-image: url('/src/assets/gradient-bg.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bungee', sans-serif;
+    letter-spacing: 0.02em;
+  }
+}
+
+@layer utilities {
+  .text-klash {
+    color: hsl(var(--klash-red));
+  }
+  
+  .bg-gradient-klash {
+    background: var(--gradient-red);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .shadow-glow-intense {
+    box-shadow: var(--shadow-glow-intense);
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:scale-[1.02] hover:-translate-y-2;
+    box-shadow: var(--shadow-card);
+  }
+  
+  .hover-lift:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+}
+
