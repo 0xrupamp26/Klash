@@ -174,4 +174,44 @@ We chose **Aptos blockchain** as our foundation for several critical reasons:
 
 ### **Under The Hood (Technical Flow)**
 
-#### **Phase 1: Market Discovery**
+#### ## 🛠️ Technology Stack
+
+### **Frontend**
+- **React 18** + **TypeScript**: Modern, type-safe UI
+- **Vite**: Lightning-fast dev experience
+- **shadcn/ui**: Beautiful, accessible component library
+- **TailwindCSS**: Utility-first styling
+- **Aptos Wallet Adapter**: Seamless Web3 integration
+- **Axios**: API communication
+- **React Query**: Data fetching and caching
+
+### **Backend**
+- **NestJS**: Modular, scalable Node.js framework
+- **MongoDB**: NoSQL database for flexibility
+- **Mongoose**: ODM for MongoDB
+- **Redis**: Caching and real-time data
+- **JWT**: Secure authentication
+- **CORS**: Cross-origin handling
+
+### **AI & Data**
+- **Python Microservices**: NLP and sentiment analysis
+- **Twitter.io API**: Real-time tweet streaming
+- **HuggingFace Transformers**: Pre-trained sentiment models
+- **Custom NLP Pipeline**: Controversy detection algorithms
+
+### **Blockchain**
+- **Aptos**: Layer 1 blockchain
+- **Move Language**: Smart contract development
+- **Aptos SDK**: TypeScript integration
+- **Petra Wallet**: Primary wallet integration
+
+### **DevOps**
+- **Docker**: Containerization
+- **NGINX**: Load balancing and CDN
+- **GitHub Actions**: CI/CD pipeline
+- **AWS/GCP**: Cloud infrastructure
+
+---
+
+## 🏗️ System Architecture
+

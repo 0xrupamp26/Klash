@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SeedService } from './seed.service';
+import { Market, MarketSchema } from '../schemas/market.schema';
 
 @Module({
     imports: [
@@ -11,7 +13,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             }),
             inject: [ConfigService],
         }),
+        MongooseModule.forFeature([{ name: Market.name, schema: MarketSchema }]),
     ],
+    providers: [SeedService],
     exports: [MongooseModule],
 })
 export class DatabaseModule { }
