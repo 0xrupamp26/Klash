@@ -1,1 +1,1 @@
-# Frontend Of Klash
+# Smart Contracts Of Klash
