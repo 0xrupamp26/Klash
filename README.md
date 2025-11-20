@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/klash-banner.png" alt="Klash Banner" width="100%"/>
+  <img src="C:\RupamKarmakar\Codes\Products\Klash\KlashMVP\klash-brand-assets\KlashLogo.png" alt="Klash Banner" width="100%"/>
   
   # 🔥 KLASH
   ### Put Your Money Where The Mouth Is
