@@ -1,98 +1,176 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+<div align="center">
+  <img src="./assets/klash-banner.png" alt="Klash Banner" width="100%"/>
+  
+  # 🔥 KLASH
+  ### Put Your Money Where The Mouth Is
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Aptos](https://img.shields.io/badge/Aptos-Blockchain-00D4AA)](https://aptoslabs.com/)
+  [![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
+  [![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+  **The world's first AI-powered, on-chain prediction market for real-time Twitter controversies**
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+  [🌐 Website](https://www.klash.live/) • [📋 Waitlist](https://drive.google.com/file/d/1dNkHCRAyWqZDusQaEMa2yPZpLfiQ1tfS/view?usp=drive_link) • [📧 Contact](mailto:klash.market@gmail.com) • [🐦 Twitter](https://twitter.com/klash_live)
+</div>
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📖 Table of Contents
 
-## Project setup
+- [What is Klash?](#what-is-klash)
+- [The Problem We're Solving](#the-problem-were-solving)
+- [Our Solution](#our-solution)
+- [Why Aptos?](#why-aptos)
+- [Why Now?](#why-now)
+- [How It Works](#how-it-works)
+- [Technology Stack](#technology-stack)
+- [System Architecture](#system-architecture)
+- [Key Features](#key-features)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Development Roadmap](#development-roadmap)
+- [Business Model](#business-model)
+- [Team](#team)
+- [Contributing](#contributing)
+- [Contact & Community](#contact--community)
+- [License](#license)
 
-```bash
-$ npm install
-```
+---
 
-## Compile and run the project
+## 🎯 What is Klash?
 
-```bash
-# development
-$ npm run start
+**Klash** is a revolutionary Web3 prediction market platform that transforms how people engage with online controversies and debates. We leverage AI to automatically detect trending debates on Twitter/X, create instant prediction markets, and resolve them transparently using sentiment analysis—all settled on-chain via Aptos blockchain.
 
-# watch mode
-$ npm run start:dev
+Think of it as **"Twitter meets DeFi casino"**—where every viral argument, cultural debate, or trending controversy becomes a tradable market where you can back your opinion with real money.
 
-# production mode
-$ npm run start:prod
-```
+### 🌟 The Vision
 
-## Run tests
+In a world where everyone has opinions but few are held accountable, Klash creates a marketplace for conviction. We're building the infrastructure for **provable social consensus**—where the internet's collective wisdom is quantified, traded, and settled transparently on-chain.
 
-```bash
-# unit tests
-$ npm run test
+---
 
-# e2e tests
-$ npm run test:e2e
+## 🔴 The Problem We're Solving
 
-# test coverage
-$ npm run test:cov
-```
+### **1. Debates Without Resolution**
+Every day, millions argue on social media about sports, politics, crypto, and culture—but these debates rarely have definitive outcomes or accountability.
 
-## Deployment
+### **2. Disconnected Prediction Markets**
+Existing prediction markets (Polymarket, Kalshi) are:
+- **Slow**: Manual curation takes days
+- **Disconnected**: Not where culture happens (Twitter/X)
+- **Limited**: Focus only on major political/economic events
+- **Single-chain**: Locked to one blockchain ecosystem
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### **3. Lack of Trust in Resolution**
+Traditional betting platforms use centralized oracles or moderators, creating trust issues and slow settlement times.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### **4. Web3 Adoption Gap**
+Most Web3 apps have poor UX and aren't built around social virality—the primary driver of internet culture.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+---
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## ✨ Our Solution
 
-## Resources
+Klash solves these problems through:
 
-Check out a few resources that may come in handy when working with NestJS:
+### **🤖 AI-Powered Automation**
+- **Auto-Detection**: Our AI crawler monitors Twitter 24/7, identifying controversial tweets with debate potential
+- **Instant Markets**: New markets are created within minutes of a controversy trending
+- **Smart Resolution**: Sentiment analysis on thousands of replies determines outcomes algorithmically
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### **⚡ Real-Time & Social-First**
+- Markets appear as controversies trend—not days later
+- Directly integrated with where debates happen (Twitter/X)
+- Viral by design: each market is shareable and meme-able
 
-## Support
+### **🔗 Blockchain-Native Trust**
+- All markets, bets, and outcomes are on-chain (Aptos)
+- Transparent resolution with sentiment data logged
+- Instant payouts via smart contracts
+- No centralized moderators needed
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### **🌍 Accessible & Viral**
+- One-click betting with Web3 wallet
+- Mobile-first, sleek UI built for TikTok/Twitter generation
+- Gamified experience with leaderboards and social sharing
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🚀 Why Aptos?
 
-## License
+We chose **Aptos blockchain** as our foundation for several critical reasons:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### **1. Speed & Scalability**
+- **160,000+ TPS**: Essential for handling viral, real-time betting
+- **Sub-second finality**: Users get instant confirmation
+- **Low fees**: Makes micro-bets economically viable
+
+### **2. Move Programming Language**
+- **Safety-first**: Move's resource-oriented design prevents common smart contract vulnerabilities
+- **Formal verification**: Critical for financial applications handling user funds
+- **Better developer experience**: Cleaner, more intuitive than Solidity
+
+### **3. Parallel Execution**
+- Aptos's Block-STM enables parallel transaction processing
+- Perfect for our use case: thousands of users betting on different markets simultaneously
+- No network congestion during viral spikes
+
+### **4. Growing Ecosystem**
+- Active developer community and tooling
+- Strong institutional backing (a16z, FTX Ventures, Binance Labs)
+- Focus on mass adoption and user experience
+
+### **5. Future-Ready**
+- Built for Web3 social applications
+- Native account abstraction support
+- Seamless integration with future cross-chain protocols (Rome Protocol)
+
+**In short**: Aptos gives us the speed of Web2 with the trust of Web3—exactly what a viral social app needs.
+
+---
+
+## ⏰ Why Now?
+
+### **1. Prediction Markets Are Proven**
+- Polymarket hit $3B+ trading volume in 2024
+- Demonstrated massive demand for betting on real-world events
+- But they're limited to major political events—we're targeting **daily internet culture**
+
+### **2. AI is Ready**
+- LLMs (GPT-4, Gemini) can now reliably detect sentiment and controversy
+- NLP technology is mature enough for automated market resolution
+- Cost-effective to run at scale
+
+### **3. Web3 Infrastructure Matured**
+- Wallets (Petra, Phantom) are user-friendly
+- Fast, cheap blockchains (Aptos, Solana) enable consumer apps
+- Cross-chain infrastructure emerging (Rome Protocol)
+
+### **4. Social Media is Peak Engagement**
+- Twitter/X has 550M+ monthly active users
+- Controversial content drives 10x more engagement
+- Users already debate daily—we're just monetizing conviction
+
+### **5. Cultural Shift**
+- Gen Z/Millennials prefer experiential spending
+- Meme culture = mainstream culture
+- Crypto adoption accelerating (ETF approval, institutional entry)
+
+**The Perfect Storm**: Proven demand (Polymarket) + Available technology (AI/Aptos) + Cultural moment (viral social + Web3) = **Klash**
+
+---
+
+## 🔧 How It Works
+
+### **For Users (Simple Flow)**
+
+1. **🔍 Discover**: Browse trending markets on Klash—all sourced from viral Twitter debates
+2. **💰 Bet**: Connect wallet, pick a side (Team A/B or Yes/No), place your bet
+3. **📊 Track**: Watch real-time odds and sentiment shift as more people vote
+4. **💸 Win**: When resolved, winners get paid instantly on-chain
+
+### **Under The Hood (Technical Flow)**
+
+#### **Phase 1: Market Discovery**
