@@ -12,7 +12,7 @@
 
   **The world's first AI-powered, on-chain opinion market for real-time Twitter controversies**
 
-  [🌐 Website](https://www.klash.live/) • [📋 Waitlist](https://drive.google.com/file/d/1dNkHCRAyWqZDusQaEMa2yPZpLfiQ1tfS/view?usp=drive_link) • [📧 Contact](mailto:klash.market@gmail.com) • [🐦 Twitter](https://twitter.com/klash_live)
+  [🌐 Waitlist](https://www.klash.live/) • [📋 Pitch-Deck](https://drive.google.com/file/d/1dNkHCRAyWqZDusQaEMa2yPZpLfiQ1tfS/view?usp=drive_link) • [📧 Contact](mailto:klash.market@gmail.com) • [🐦 Twitter](https://twitter.com/klash_live)
 </div>
 
 ---
