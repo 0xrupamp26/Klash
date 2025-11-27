@@ -5,22 +5,41 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Flame, Clock, TrendingUp, Sparkles } from "lucide-react";
 import klashLogo from "@/assets/klash-logo.png.png";
-import { mockMarkets } from "@/data/mockMarkets";
+import { marketApi } from "@/services/api-client";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Index = () => {
+  const [markets, setMarkets] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMarkets = async () => {
+      try {
+        const response = await marketApi.getMarkets();
+        if (response.success && response.data) {
+          setMarkets(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching markets:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMarkets();
+  }, []);
+
   const handleBet = async (marketId: string, outcome: number, amount: number) => {
-    // Mock bet handling for demo
     console.log('Bet placed:', { marketId, outcome, amount });
   };
 
-  // Use mock data for demo
-  const displayMarkets = mockMarkets;
+  const displayMarkets = markets;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Hero Banner */}
       <section className="relative overflow-hidden border-b border-border/20">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-primary/5 to-transparent animate-pulse-slow" />
@@ -34,11 +53,11 @@ const Index = () => {
                 className="w-full max-w-2xl mx-auto drop-shadow-2xl"
               />
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 animate-fade-in" style={{ animationDelay: "0.2s" }}>
               Put Your Money Where The Mouth Is
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-foreground/90 mb-4 animate-fade-in font-bold" style={{ animationDelay: "0.3s" }}>
               The most electrifying prediction market for viral moments
             </p>
@@ -95,7 +114,7 @@ const Index = () => {
             ]}
           />
         </div>
-        
+
         <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
           <FeaturedMarketCard
             title="How Many Days Will This Be Alive on the Algorithm?"
