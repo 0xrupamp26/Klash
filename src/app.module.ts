@@ -8,6 +8,7 @@ import { MarketsModule } from './markets/markets.module';
 import { BetsModule } from './bets/bets.module';
 import { UsersModule } from './users/users.module';
 import { TwitterAiModule } from './twitter-ai/twitter-ai.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TwitterAiModule } from './twitter-ai/twitter-ai.module';
     BetsModule,
     UsersModule,
     TwitterAiModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

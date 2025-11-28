@@ -156,7 +156,7 @@ class ApiClient {
   private handleError(error: any): ApiResponse {
     const message = error.response?.data?.message || error.message || 'An error occurred';
     const errorDetail = error.response?.data?.error || error;
-    
+
     return {
       success: false,
       message,
@@ -177,8 +177,8 @@ export const marketApi = {
 
 export const betApi = {
   placeBet: (data: { marketId: string; outcome: number; amount: number; walletAddress: string }) =>
-    apiClient.post<Bet>('bets', data),
-  getUserBets: (userId: string) => apiClient.get<Bet[]>(`bets/user/${userId}`),
+    apiClient.post<Bet>(`markets/${data.marketId}/bets`, data),
+  getUserBets: (userId: string) => apiClient.get<Bet[]>(`users/${userId}/bets`),
 };
 
 export const resolutionApi = {

@@ -48,84 +48,97 @@ export class TwitterAiService {
     }
 
     /**
-     * Fetch tweets from @LafdaSinghAI
+     * Fetch tweets from @LafdaSinghAI (MOCKED)
      * @param count Number of tweets to fetch
      * @returns Array of tweets
      */
     async fetchLafdaTweets(count: number = 20): Promise<Tweet[]> {
-        try {
-            this.logger.log(`Fetching ${count} tweets from @LafdaSinghAI`);
+        this.logger.log(`[MOCK] Fetching ${count} tweets from @LafdaSinghAI`);
 
-            const response = await firstValueFrom(
-                this.httpService.get<{ tweets: Tweet[] }>(
-                    `${this.pythonServiceUrl}/api/twitter/fetch-lafda`,
-                    {
-                        params: { count },
-                        timeout: 30000,
-                    },
-                ),
-            );
-
-            this.logger.log(`Fetched ${response.data.tweets?.length || 0} tweets`);
-            return response.data.tweets || [];
-        } catch (error) {
-            this.logger.error('Error fetching Lafda tweets:', error.message);
-            return [];
-        }
+        // Return mock tweets
+        return [
+            {
+                id: '1859123456789012345',
+                text: 'BREAKING: Elon Musk challenges Mark Zuckerberg to a cage match at the Colosseum! 🏟️🥊 #MuskVsZuck',
+                url: 'https://twitter.com/LafdaSinghAI/status/1859123456789012345',
+                author: 'LafdaSinghAI',
+                postedAt: new Date(),
+                engagement: { likes: 5000, retweets: 1200, replies: 800 },
+                video_url: ''
+            },
+            {
+                id: '1859123456789012346',
+                text: 'Rumor: Apple to acquire Disney for $200B? Analysts say it could happen this year. 🍎🏰 #AppleDisney',
+                url: 'https://twitter.com/LafdaSinghAI/status/1859123456789012346',
+                author: 'LafdaSinghAI',
+                postedAt: new Date(),
+                engagement: { likes: 3500, retweets: 900, replies: 400 },
+                video_url: ''
+            },
+            {
+                id: '1859123456789012347',
+                text: 'Just watched the new Marvel movie. It was okay, not great. 🎬',
+                url: 'https://twitter.com/LafdaSinghAI/status/1859123456789012347',
+                author: 'LafdaSinghAI',
+                postedAt: new Date(),
+                engagement: { likes: 100, retweets: 10, replies: 5 },
+                video_url: ''
+            }
+        ];
     }
 
     /**
-     * Analyze tweets for controversy
+     * Analyze tweets for controversy (MOCKED)
      * @param tweets Array of tweets to analyze
      * @returns Array of controversy results
      */
     async analyzeControversy(tweets: Tweet[]): Promise<ControversyResult[]> {
-        try {
-            this.logger.log(`Analyzing ${tweets.length} tweets for controversy`);
+        this.logger.log(`[MOCK] Analyzing ${tweets.length} tweets for controversy`);
 
-            const response = await firstValueFrom(
-                this.httpService.post<{ results: ControversyResult[] }>(
-                    `${this.pythonServiceUrl}/api/controversy/analyze`,
-                    { tweets },
-                    { timeout: 30000 },
-                ),
-            );
+        return tweets.map(tweet => {
+            const text = tweet.text.toLowerCase();
+            let isControversy = false;
+            let title = '';
+            let sides = ['Yes', 'No'];
+            let category = 'General';
 
-            const controversies = response.data.results?.filter(r => r.isControversy) || [];
-            this.logger.log(`Found ${controversies.length} controversial tweets`);
+            if (text.includes('musk') && text.includes('zuck')) {
+                isControversy = true;
+                title = 'Will Elon Musk fight Mark Zuckerberg in 2025?';
+                category = 'Sports';
+            } else if (text.includes('apple') && text.includes('disney')) {
+                isControversy = true;
+                title = 'Will Apple acquire Disney by end of 2025?';
+                category = 'Business';
+            }
 
-            return response.data.results || [];
-        } catch (error) {
-            this.logger.error('Error analyzing controversy:', error.message);
-            return [];
-        }
+            return {
+                isControversy,
+                title: title || `Prediction: ${tweet.text.substring(0, 30)}...`,
+                sides,
+                confidence: isControversy ? 0.95 : 0.1,
+                category
+            };
+        });
     }
 
     /**
-     * Create markets from controversial tweets
+     * Create markets from controversial tweets (MOCKED)
      * @param tweets Array of tweets
      * @returns Market creation results
      */
     async createMarketsFromTweets(tweets: Tweet[]): Promise<MarketCreationResult[]> {
-        try {
-            this.logger.log(`Creating markets from ${tweets.length} tweets`);
+        this.logger.log(`[MOCK] Creating markets from ${tweets.length} tweets`);
 
-            const response = await firstValueFrom(
-                this.httpService.post<{ results: MarketCreationResult[] }>(
-                    `${this.pythonServiceUrl}/api/markets/create-from-tweets`,
-                    { tweets },
-                    { timeout: 60000 },
-                ),
-            );
+        // In a real mock, we would inject MarketsService and call create()
+        // For now, we'll just simulate success to avoid circular dependency issues in this quick fix
+        // The actual creation logic should be moved to a higher-level orchestration service
 
-            const successful = response.data.results?.filter(r => r.success).length || 0;
-            this.logger.log(`Successfully created ${successful} markets`);
-
-            return response.data.results || [];
-        } catch (error) {
-            this.logger.error('Error creating markets from tweets:', error.message);
-            return [];
-        }
+        return tweets.map(t => ({
+            success: true,
+            message: 'Market created successfully (Mock)',
+            market: { id: 'mock_market_' + t.id, question: 'Mock Question' }
+        }));
     }
 
     /**

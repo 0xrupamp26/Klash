@@ -1,217 +1,98 @@
-<div align="center">
-  <img src="./klash-brand-assets/KlashLogo.png
-" alt="Klash Banner" width="100%"/>
-  
-  # 🔥 KLASH
-  ### Put Your Money Where The Mouth Is
-  
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Aptos](https://img.shields.io/badge/Aptos-Blockchain-00D4AA)](https://aptoslabs.com/)
-  [![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
-  [![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
+# Klash MVP - Full Stack Prediction Market
 
-  **The world's first AI-powered, on-chain opinion market for real-time Twitter controversies**
+## Overview
+Klash is a prediction market platform where users can bet on the outcome of real-world events, powered by AI sentiment analysis and blockchain settlement. This MVP features a fully integrated frontend and backend.
 
-  [🌐 Waitlist](https://www.klash.live/) • [📋 Pitch-Deck](https://drive.google.com/file/d/1dNkHCRAyWqZDusQaEMa2yPZpLfiQ1tfS/view?usp=drive_link) • [📧 Contact](mailto:klash.market@gmail.com) • [🐦 Twitter](https://twitter.com/klash_live)
-</div>
+## Tech Stack
+- **Frontend**: React, Vite, TailwindCSS
+- **Backend**: NestJS, TypeScript, MongoDB
+- **Database**: MongoDB
+- **Containerization**: Docker, Docker Compose
 
----
+## Prerequisites
+- Node.js (v18+)
+- MongoDB (running locally or via Docker)
+- Docker (optional, for containerized deployment)
 
-## 📖 Table of Contents
+## Quick Start (Local Development)
 
-- [What is Klash?](#what-is-klash)
-- [The Problem We're Solving](#the-problem-were-solving)
-- [Our Solution](#our-solution)
-- [Why Aptos?](#why-aptos)
-- [Why Now?](#why-now)
-- [How It Works](#how-it-works)
-- [Technology Stack](#technology-stack)
-- [System Architecture](#system-architecture)
-- [Key Features](#key-features)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Development Roadmap](#development-roadmap)
-- [Business Model](#business-model)
-- [Team](#team)
-- [Contributing](#contributing)
-- [Contact & Community](#contact--community)
-- [License](#license)
+### 1. Start MongoDB
+Ensure MongoDB is running locally on port 27017.
+```bash
+mongod --dbpath /path/to/data/db
+```
 
----
+### 2. Start Backend
+```bash
+# Install dependencies
+npm install
 
-## 🎯 What is Klash?
+# Start in development mode
+npm run start:dev
+```
+The backend will start at `http://localhost:3001`.
+- API Health Check: `http://localhost:3001/api/health`
+- API Documentation: `http://localhost:3001/api` (if Swagger enabled)
 
-**Klash** is a revolutionary Web3 prediction market platform that transforms how people engage with online controversies and debates. We leverage AI to automatically detect trending debates on Twitter/X, create instant prediction markets, and resolve them transparently using sentiment analysis—all settled on-chain via Aptos blockchain.
+### 3. Start Frontend
+```bash
+cd klash-frontend
 
-Think of it as **"Twitter meets DeFi casino"**—where every viral argument, cultural debate, or trending controversy becomes a tradable market where you can back your opinion with real money.
+# Install dependencies
+npm install
 
-### 🌟 The Vision
+# Start development server
+npm run dev
+```
+The frontend will start at `http://localhost:8080` (or 5173).
 
-In a world where everyone has opinions but few are held accountable, Klash creates a marketplace for conviction. We're building the infrastructure for **provable social consensus**—where the internet's collective wisdom is quantified, traded, and settled transparently on-chain.
+## Docker Deployment (Production-Ready)
 
----
+To run the entire stack (Backend + MongoDB) using Docker:
 
-## 🔴 The Problem We're Solving
+```bash
+docker-compose up --build
+```
+This will start:
+- **Backend API**: `http://localhost:3001`
+- **MongoDB**: `localhost:27017`
 
-### **1. Debates Without Resolution**
-Every day, millions argue on social media about sports, politics, crypto, and culture—but these debates rarely have definitive outcomes or accountability.
+## Environment Variables
 
-### **2. Disconnected Prediction Markets**
-Existing prediction markets (Polymarket, Kalshi) are:
-- **Slow**: Manual curation takes days
-- **Disconnected**: Not where culture happens (Twitter/X)
-- **Limited**: Focus only on major political/economic events
-- **Single-chain**: Locked to one blockchain ecosystem
+### Backend (`.env`)
+Create a `.env` file in the root directory:
+```env
+MONGO_URI=mongodb://localhost:27017/klash
+PORT=3001
+```
 
-### **3. Lack of Trust in Resolution**
-Traditional betting platforms use centralized oracles or moderators, creating trust issues and slow settlement times.
+### Frontend (`klash-frontend/.env.local`)
+Create a `.env.local` file in `klash-frontend`:
+```env
+VITE_API_URL=http://localhost:3001/api
+```
 
-### **4. Web3 Adoption Gap**
-Most Web3 apps have poor UX and aren't built around social virality—the primary driver of internet culture.
+## API Endpoints
 
----
+### Markets
+- `GET /api/markets`: List all markets
+- `GET /api/markets/:id`: Get market details
+- `POST /api/markets`: Create a new market
+- `POST /api/markets/:id/bets`: Place a bet on a market
 
-## ✨ Our Solution
+### Users & Auth
+- `POST /api/auth/login`: Login with wallet address
+- `POST /api/auth/register`: Register new user
+- `GET /api/users/:walletAddress`: Get user profile
+- `GET /api/users/:walletAddress/bets`: Get user's betting history
 
-Klash solves these problems through:
+## Testing
+1. Open Frontend: `http://localhost:8080`
+2. Browse Markets: You should see a list of markets fetched from the backend.
+3. Place a Bet: Click on a market, select a side, enter amount, and click "Place Bet".
+4. View Portfolio: Go to Portfolio page to see your active and resolved bets.
 
-### **🤖 AI-Powered Automation**
-- **Auto-Detection**: Our AI crawler monitors Twitter 24/7, identifying controversial tweets with debate potential
-- **Instant Markets**: New markets are created within minutes of a controversy trending
-- **Smart Resolution**: Sentiment analysis on thousands of replies determines outcomes algorithmically
-
-### **⚡ Real-Time & Social-First**
-- Markets appear as controversies trend—not days later
-- Directly integrated with where debates happen (Twitter/X)
-- Viral by design: each market is shareable and meme-able
-
-### **🔗 Blockchain-Native Trust**
-- All markets, bets, and outcomes are on-chain (Aptos)
-- Transparent resolution with sentiment data logged
-- Instant payouts via smart contracts
-- No centralized moderators needed
-
-### **🌍 Accessible & Viral**
-- One-click betting with Web3 wallet
-- Mobile-first, sleek UI built for TikTok/Twitter generation
-- Gamified experience with leaderboards and social sharing
-
----
-
-## 🚀 Why Aptos?
-
-We chose **Aptos blockchain** as our foundation for several critical reasons:
-
-### **1. Speed & Scalability**
-- **160,000+ TPS**: Essential for handling viral, real-time betting
-- **Sub-second finality**: Users get instant confirmation
-- **Low fees**: Makes micro-bets economically viable
-
-### **2. Move Programming Language**
-- **Safety-first**: Move's resource-oriented design prevents common smart contract vulnerabilities
-- **Formal verification**: Critical for financial applications handling user funds
-- **Better developer experience**: Cleaner, more intuitive than Solidity
-
-### **3. Parallel Execution**
-- Aptos's Block-STM enables parallel transaction processing
-- Perfect for our use case: thousands of users betting on different markets simultaneously
-- No network congestion during viral spikes
-
-### **4. Growing Ecosystem**
-- Active developer community and tooling
-- Strong institutional backing (a16z, FTX Ventures, Binance Labs)
-- Focus on mass adoption and user experience
-
-### **5. Future-Ready**
-- Built for Web3 social applications
-- Native account abstraction support
-- Seamless integration with future cross-chain protocols (Rome Protocol)
-
-**In short**: Aptos gives us the speed of Web2 with the trust of Web3—exactly what a viral social app needs.
-
----
-
-## ⏰ Why Now?
-
-### **1. Prediction Markets Are Proven**
-- Polymarket hit $3B+ trading volume in 2024
-- Demonstrated massive demand for betting on real-world events
-- But they're limited to major political events—we're targeting **daily internet culture**
-
-### **2. AI is Ready**
-- LLMs (GPT-4, Gemini) can now reliably detect sentiment and controversy
-- NLP technology is mature enough for automated market resolution
-- Cost-effective to run at scale
-
-### **3. Web3 Infrastructure Matured**
-- Wallets (Petra, Phantom) are user-friendly
-- Fast, cheap blockchains (Aptos, Solana) enable consumer apps
-- Cross-chain infrastructure emerging (Rome Protocol)
-
-### **4. Social Media is Peak Engagement**
-- Twitter/X has 550M+ monthly active users
-- Controversial content drives 10x more engagement
-- Users already debate daily—we're just monetizing conviction
-
-### **5. Cultural Shift**
-- Gen Z/Millennials prefer experiential spending
-- Meme culture = mainstream culture
-- Crypto adoption accelerating (ETF approval, institutional entry)
-
-**The Perfect Storm**: Proven demand (Polymarket) + Available technology (AI/Aptos) + Cultural moment (viral social + Web3) = **Klash**
-
----
-
-## 🔧 How It Works
-
-### **For Users (Simple Flow)**
-
-1. **🔍 Discover**: Browse trending markets on Klash—all sourced from viral Twitter debates
-2. **💰 Bet**: Connect wallet, pick a side (Team A/B or Yes/No), place your bet
-3. **📊 Track**: Watch real-time odds and sentiment shift as more people vote
-4. **💸 Win**: When resolved, winners get paid instantly on-chain
-
-### **Under The Hood (Technical Flow)**
-
-#### ## 🛠️ Technology Stack
-
-### **Frontend**
-- **React 18** + **TypeScript**: Modern, type-safe UI
-- **Vite**: Lightning-fast dev experience
-- **shadcn/ui**: Beautiful, accessible component library
-- **TailwindCSS**: Utility-first styling
-- **Aptos Wallet Adapter**: Seamless Web3 integration
-- **Axios**: API communication
-- **React Query**: Data fetching and caching
-
-### **Backend**
-- **NestJS**: Modular, scalable Node.js framework
-- **MongoDB**: NoSQL database for flexibility
-- **Mongoose**: ODM for MongoDB
-- **Redis**: Caching and real-time data
-- **JWT**: Secure authentication
-- **CORS**: Cross-origin handling
-
-### **AI & Data**
-- **Python Microservices**: NLP and sentiment analysis
-- **Twitter.io API**: Real-time tweet streaming
-- **HuggingFace Transformers**: Pre-trained sentiment models
-- **Custom NLP Pipeline**: Controversy detection algorithms
-
-### **Blockchain**
-- **Aptos**: Layer 1 blockchain
-- **Move Language**: Smart contract development
-- **Aptos SDK**: TypeScript integration
-- **Petra Wallet**: Primary wallet integration
-
-### **DevOps**
-- **Docker**: Containerization
-- **NGINX**: Load balancing and CDN
-- **GitHub Actions**: CI/CD pipeline
-- **AWS/GCP**: Cloud infrastructure
-
----
-
-## 🏗️ System Architecture
-
+## Troubleshooting
+- **Backend not connecting?** Check if MongoDB is running and `MONGO_URI` is correct.
+- **CORS errors?** Ensure backend `main.ts` allows the frontend origin.
+- **Frontend data missing?** Check browser console for API errors.

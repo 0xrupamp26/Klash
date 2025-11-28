@@ -1,10 +1,15 @@
 import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
 import { MarketsService } from './markets.service';
 import { Market } from '../schemas/market.schema';
+import { BetsService } from '../bets/bets.service';
+import { Bet } from '../schemas/bet.schema';
 
 @Controller('markets')
 export class MarketsController {
-    constructor(private readonly marketsService: MarketsService) { }
+    constructor(
+        private readonly marketsService: MarketsService,
+        private readonly betsService: BetsService,
+    ) { }
 
     @Get()
     async findAll(): Promise<Market[]> {
@@ -23,5 +28,16 @@ export class MarketsController {
     @Post()
     async create(@Body() createMarketDto: any): Promise<Market> {
         return this.marketsService.create(createMarketDto);
+    }
+
+    @Post(':id/bets')
+    async placeBet(
+        @Param('id') marketId: string,
+        @Body() placeBetDto: { outcome: number; amount: number; walletAddress: string },
+    ): Promise<Bet> {
+        return this.betsService.placeBet({
+            ...placeBetDto,
+            marketId,
+        });
     }
 }
