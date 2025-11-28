@@ -4,8 +4,10 @@ import { TwitterAiService } from './twitter-ai.service';
 import { TwitterAiController } from './twitter-ai.controller';
 import { TwitterAiScheduler } from './twitter-ai.scheduler';
 
+import { MarketsModule } from '../markets/markets.module';
+
 @Module({
-    imports: [HttpModule],
+    imports: [HttpModule, MarketsModule],
     controllers: [TwitterAiController],
     providers: [TwitterAiService, TwitterAiScheduler],
     exports: [TwitterAiService],
