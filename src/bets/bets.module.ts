@@ -1,16 +1,13 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { Module, forwardRef } from '@nestjs/common';
 import { BetsController } from './bets.controller';
 import { BetsService } from './bets.service';
-import { Bet, BetSchema } from '../schemas/bet.schema';
-import { Market, MarketSchema } from '../schemas/market.schema';
+import { WebsocketModule } from '../websocket/websocket.module';
+import { MarketsModule } from '../markets/markets.module';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([
-            { name: Bet.name, schema: BetSchema },
-            { name: Market.name, schema: MarketSchema },
-        ]),
+        WebsocketModule,
+        forwardRef(() => MarketsModule),
     ],
     controllers: [BetsController],
     providers: [BetsService],

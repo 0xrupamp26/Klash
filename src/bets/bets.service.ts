@@ -1,15 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Bet, BetDocument } from '../schemas/bet.schema';
-import { Market, MarketDocument } from '../schemas/market.schema';
-import { v4 as uuidv4 } from 'uuid';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InMemoryBetsService, Bet } from './in-memory-bets.service';
+import { InMemoryMarketsService } from '../markets/in-memory-markets.service';
+import { MarketGateway } from '../websocket/market.gateway';
+import { MarketResolutionService } from '../markets/market-resolution.service';
 
 @Injectable()
 export class BetsService {
     constructor(
-        @InjectModel(Bet.name) private betModel: Model<BetDocument>,
-        @InjectModel(Market.name) private marketModel: Model<MarketDocument>,
+        private readonly inMemoryBetsService: InMemoryBetsService,
+        private readonly inMemoryMarketsService: InMemoryMarketsService,
+        private marketGateway: MarketGateway,
+        private marketResolutionService: MarketResolutionService,
     ) { }
 
     async placeBet(placeBetDto: {
@@ -18,33 +19,45 @@ export class BetsService {
         amount: number;
         walletAddress: string;
     }): Promise<Bet> {
-        const market = await this.marketModel.findOne({ marketId: placeBetDto.marketId }).exec();
+        const market = await this.inMemoryMarketsService.findOne(placeBetDto.marketId);
 
         if (!market) {
             throw new NotFoundException(`Market with ID ${placeBetDto.marketId} not found`);
         }
 
-        if (market.status !== 'OPEN') {
-            throw new Error('Market is not open for betting');
+        // Validate market status
+        if (market.status !== 'WAITING_PLAYERS' && market.status !== 'ACTIVE') {
+            throw new BadRequestException('Market is not accepting bets');
         }
 
-        // Calculate odds based on current pool
+        // Check if player already bet on this market
+        const existingPlayer = market.currentPlayers.find(
+            p => p.walletAddress === placeBetDto.walletAddress
+        );
+
+        if (existingPlayer) {
+            throw new BadRequestException('You have already placed a bet on this market');
+        }
+
+        // Check if market is full
+        if (market.currentPlayers.length >= market.playerLimit) {
+            throw new BadRequestException('Market is full');
+        }
+
+        // Calculate odds
         const totalPool = market.pools.total || 0;
         const outcomePool = placeBetDto.outcome === 0 ? market.pools.outcomeA : market.pools.outcomeB;
         const poolRatio = totalPool > 0 ? (totalPool + placeBetDto.amount) / (outcomePool + placeBetDto.amount) : 2;
 
-        const newBet = new this.betModel({
-            betId: uuidv4(),
-            userId: placeBetDto.walletAddress, // Using wallet address as userId for now
+        // Create bet
+        const newBet = await this.inMemoryBetsService.create({
+            userId: placeBetDto.walletAddress,
             marketId: placeBetDto.marketId,
             outcome: placeBetDto.outcome,
             amount: placeBetDto.amount,
-            walletAddress: placeBetDto.walletAddress,
-            status: 'ACTIVE',
-            odds: {
-                atPlacement: poolRatio,
-                poolRatio: poolRatio,
-            },
+            odds: poolRatio,
+            status: 'PENDING',
+            timestamp: new Date(),
         });
 
         // Update market pools
@@ -54,17 +67,40 @@ export class BetsService {
         } else {
             market.pools.outcomeB += placeBetDto.amount;
         }
-        market.totalBets += 1;
 
-        await market.save();
-        return newBet.save();
+        // Add player to market
+        market.currentPlayers.push({
+            walletAddress: placeBetDto.walletAddress,
+            outcome: placeBetDto.outcome,
+            amount: placeBetDto.amount,
+            timestamp: new Date(),
+        });
+
+        market.totalBets += 1;
+        market.uniqueBettors = market.currentPlayers.length;
+
+        await this.inMemoryMarketsService.update(market.marketId, market);
+
+        // Emit player joined event
+        this.marketGateway.playerJoined(placeBetDto.marketId, {
+            walletAddress: placeBetDto.walletAddress,
+            outcome: placeBetDto.outcome,
+            amount: placeBetDto.amount,
+            currentPlayerCount: market.currentPlayers.length,
+            playerLimit: market.playerLimit,
+        });
+
+        // Check if market should be activated
+        await this.marketResolutionService.checkAndActivateMarket(placeBetDto.marketId);
+
+        return newBet;
     }
 
-    async getUserBets(userId: string): Promise<Bet[]> {
-        return this.betModel.find({ userId }).exec();
+    async getUserBets(walletAddress: string): Promise<Bet[]> {
+        return this.inMemoryBetsService.findByUser(walletAddress);
     }
 
     async findOne(betId: string): Promise<Bet> {
-        return this.betModel.findOne({ betId }).exec();
+        return this.inMemoryBetsService.findOne(betId);
     }
 }

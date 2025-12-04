@@ -1,17 +1,24 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { Module, forwardRef } from '@nestjs/common';
 import { MarketsController } from './markets.controller';
 import { MarketsService } from './markets.service';
-import { Market, MarketSchema } from '../schemas/market.schema';
+import { MarketResolutionService } from './market-resolution.service';
+import { InMemoryMarketsService } from './in-memory-markets.service';
+import { InMemoryBetsService } from '../bets/in-memory-bets.service';
 import { BetsModule } from '../bets/bets.module';
+import { WebsocketModule } from '../websocket/websocket.module';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: Market.name, schema: MarketSchema }]),
-        BetsModule,
+        WebsocketModule,
+        forwardRef(() => BetsModule),
     ],
     controllers: [MarketsController],
-    providers: [MarketsService],
-    exports: [MarketsService],
+    providers: [
+        InMemoryMarketsService,
+        InMemoryBetsService,
+        MarketsService,
+        MarketResolutionService
+    ],
+    exports: [MarketsService, MarketResolutionService, InMemoryMarketsService, InMemoryBetsService],
 })
 export class MarketsModule { }

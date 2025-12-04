@@ -4,10 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Clock, Users, TrendingUp, MessageSquare } from "lucide-react";
+import { ArrowLeft, Clock, Users, TrendingUp, MessageSquare, Wallet } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { marketApi, betApi } from "@/services/api-client";
+import { PlayerCountModal } from "@/components/PlayerCountModal";
+import { walletService } from "@/services/wallet-service";
+import { websocketService } from "@/services/websocket-service";
+import { toast } from "sonner";
 
 const MarketDetail = () => {
   const { id } = useParams();
@@ -16,6 +20,9 @@ const MarketDetail = () => {
   const [betAmount, setBetAmount] = useState("");
   const [selectedSide, setSelectedSide] = useState<"yes" | "no">("yes");
   const [placingBet, setPlacingBet] = useState(false);
+  const [showPlayerModal, setShowPlayerModal] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [walletBalance, setWalletBalance] = useState<number>(0);
 
   useEffect(() => {
     const fetchMarket = async () => {
@@ -34,14 +41,77 @@ const MarketDetail = () => {
     fetchMarket();
   }, [id]);
 
-  const handlePlaceBet = async () => {
-    if (!market || !betAmount) return;
+  // WebSocket integration
+  useEffect(() => {
+    if (!id) return;
+
+    websocketService.connect();
+    websocketService.joinMarket(id);
+
+    websocketService.onPlayerJoined((data) => {
+      toast.success(`Player joined! ${data.currentPlayerCount}/${data.playerLimit} players`);
+      // Refresh market data
+      fetchMarketData();
+    });
+
+    websocketService.onMarketStatusChanged((data) => {
+      toast.info(`Market status: ${data.status}`);
+      fetchMarketData();
+    });
+
+    websocketService.onMarketResolved((data) => {
+      toast.success(`Market resolved! Winner: ${data.winningAnswer}`);
+      fetchMarketData();
+    });
+
+    return () => {
+      websocketService.leaveMarket(id);
+      websocketService.removeAllListeners();
+    };
+  }, [id]);
+
+  const fetchMarketData = async () => {
+    if (!id) return;
+    try {
+      const response = await marketApi.getMarket(id);
+      if (response.success && response.data) {
+        setMarket(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching market:', error);
+    }
+  };
+
+  const handleConnectWallet = async () => {
+    try {
+      const address = await walletService.connectWallet();
+      setWalletAddress(address);
+      const balance = await walletService.getBalance();
+      setWalletBalance(balance);
+      toast.success("Wallet connected! Funded with 1 APT from faucet");
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+      toast.error("Failed to connect wallet");
+    }
+  };
+
+  const handlePlaceBetClick = () => {
+    if (!walletAddress) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+    if (!betAmount || parseFloat(betAmount) <= 0) {
+      toast.error("Please enter a valid bet amount");
+      return;
+    }
+    setShowPlayerModal(true);
+  };
+
+  const handlePlayerCountSelected = async (playerLimit: number) => {
+    if (!market || !betAmount || !walletAddress) return;
 
     setPlacingBet(true);
     try {
-      // Mock wallet address for now - in real app, get from wallet connection
-      const walletAddress = "0x123...mock";
-
       await betApi.placeBet({
         marketId: market.marketId,
         outcome: selectedSide === "yes" ? 0 : 1,
@@ -49,232 +119,233 @@ const MarketDetail = () => {
         walletAddress,
       });
 
-      // Refresh market data
-      const response = await marketApi.getMarket(market.marketId);
-      if (response.success && response.data) {
-        setMarket(response.data);
-      }
+      toast.success("Bet placed successfully!");
       setBetAmount("");
-      alert("Bet placed successfully!");
-    } catch (error) {
+
+      // Refresh market data
+      await fetchMarketData();
+
+      // Update wallet balance
+      const newBalance = await walletService.getBalance();
+      setWalletBalance(newBalance);
+    } catch (error: any) {
       console.error('Error placing bet:', error);
-      alert("Failed to place bet");
+      toast.error(error.response?.data?.message || "Failed to place bet");
     } finally {
       setPlacingBet(false);
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (!market) return <div className="min-h-screen flex items-center justify-center">Market not found</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900">
+        <Header />
+        <div className="container mx-auto px-4 py-8 flex items-center justify-center">
+          <div className="text-white">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
-  // Calculate odds (simplified)
-  const totalPool = market.pools.total || 0;
-  const poolA = market.pools.outcomeA || 0;
-  const poolB = market.pools.outcomeB || 0;
+  if (!market) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-white">Market not found</div>
+        </div>
+      </div>
+    );
+  }
 
-  const oddsA = totalPool > 0 ? Math.round((poolA / totalPool) * 100) : 50;
-  const oddsB = totalPool > 0 ? Math.round((poolB / totalPool) * 100) : 50;
-
-  const potentialWin = betAmount ? (parseFloat(betAmount) * (selectedSide === "yes" ? (100 / oddsA) : (100 / oddsB))).toFixed(2) : "0.00";
-
-  // Mock recent activity for now as backend doesn't support it yet
-  const recentActivity = [
-    { user: "0x742d...89ab", side: "YES", amount: "$500", time: "2m ago", avatar: "🔥" },
-    { user: "0x123f...45cd", side: "NO", amount: "$1,200", time: "5m ago", avatar: "💎" },
-  ];
-
-  const socialFeed = [
-    { platform: "Twitter", text: market.originalTweetText || "No tweet text", time: "Original Tweet" },
-  ];
+  const totalPool = market.pools?.total || 0;
+  const yesPool = market.pools?.outcomeA || 0;
+  const noPool = market.pools?.outcomeB || 0;
+  const yesPercentage = totalPool > 0 ? (yesPool / totalPool) * 100 : 50;
+  const currentPlayers = market.currentPlayers?.length || 0;
+  const playerLimit = market.playerLimit || 2;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-purple-900">
       <Header />
 
-      <div className="container py-8">
-        <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
+      <div className="container mx-auto px-4 py-8">
+        <Link to="/" className="inline-flex items-center text-purple-300 hover:text-purple-100 mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Markets
         </Link>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Market Header */}
-            <Card className="p-6 bg-gradient-to-br from-card to-secondary/20 border-primary/20">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <Badge className="bg-klash-red text-white mb-2 animate-pulse-slow">
-                    {market.status}
-                  </Badge>
-                  <Badge variant="outline" className="ml-2">
-                    {market.metadata?.category || "General"}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span className="font-bold text-klash">{new Date(market.closingTime).toLocaleDateString()}</span>
-                </div>
+        {/* Wallet Connection */}
+        {!walletAddress ? (
+          <Card className="bg-gradient-to-r from-purple-600 to-pink-600 border-none mb-6 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-white font-bold text-lg mb-2">Connect Wallet to Place Bets</h3>
+                <p className="text-purple-100 text-sm">Get 1 APT from testnet faucet automatically</p>
               </div>
-
-              <h1 className="text-3xl md:text-4xl font-bungee mb-4 leading-tight">
-                {market.question}
-              </h1>
-
-              <p className="text-muted-foreground text-lg mb-6">
-                {market.originalTweetText}
-              </p>
-
-              <div className="flex items-center gap-6 text-sm">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-bold">{market.totalBets?.toLocaleString() || 0}</span>
-                  <span className="text-muted-foreground">bets</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-bold">${totalPool}</span>
-                  <span className="text-muted-foreground">total pool</span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Odds Display */}
-            <div className="grid grid-cols-2 gap-4">
-              <Card
-                className={`p-6 cursor-pointer transition-all border-2 ${selectedSide === "yes"
-                  ? "border-primary bg-primary/5 shadow-glow"
-                  : "border-border hover:border-primary/50"
-                  }`}
-                onClick={() => setSelectedSide("yes")}
-              >
-                <div className="text-sm text-muted-foreground mb-1">{market.outcomes?.[0] || "YES"}</div>
-                <div className="text-2xl font-bold mb-2">{market.outcomes?.[0] || "YES"}</div>
-                <div className="text-4xl font-bungee text-klash">{oddsA}%</div>
-                <Progress value={oddsA} className="mt-4 h-2" />
-              </Card>
-
-              <Card
-                className={`p-6 cursor-pointer transition-all border-2 ${selectedSide === "no"
-                  ? "border-primary bg-primary/5 shadow-glow"
-                  : "border-border hover:border-primary/50"
-                  }`}
-                onClick={() => setSelectedSide("no")}
-              >
-                <div className="text-sm text-muted-foreground mb-1">{market.outcomes?.[1] || "NO"}</div>
-                <div className="text-2xl font-bold mb-2">{market.outcomes?.[1] || "NO"}</div>
-                <div className="text-4xl font-bungee text-muted-foreground">{oddsB}%</div>
-                <Progress value={oddsB} className="mt-4 h-2" />
-              </Card>
+              <Button onClick={handleConnectWallet} className="bg-white text-purple-600 hover:bg-gray-100">
+                <Wallet className="mr-2 h-4 w-4" />
+                Connect Wallet
+              </Button>
             </div>
-
-            {/* Social Feed */}
-            <Card className="p-6">
-              <h3 className="text-xl font-bungee mb-4 flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-klash" />
-                Live Discussion
-              </h3>
-              <div className="space-y-4">
-                {socialFeed.map((post, idx) => (
-                  <div key={idx} className="bg-secondary/30 rounded-lg p-4 border border-border/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <Badge variant="outline" className="text-xs">{post.platform}</Badge>
-                      <span className="text-xs text-muted-foreground">{post.time}</span>
-                    </div>
-                    <p className="text-sm">{post.text}</p>
-                  </div>
-                ))}
+          </Card>
+        ) : (
+          <Card className="bg-purple-900/50 border-purple-500 mb-6 p-4">
+            <div className="flex items-center justify-between text-white">
+              <div>
+                <p className="text-sm text-purple-300">Wallet Address</p>
+                <p className="font-mono text-sm">{walletAddress.slice(0, 8)}...{walletAddress.slice(-6)}</p>
               </div>
-            </Card>
+              <div className="text-right">
+                <p className="text-sm text-purple-300">Balance</p>
+                <p className="font-bold">{walletBalance.toFixed(4)} APT</p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Market Status */}
+        <Card className="bg-purple-900/50 border-purple-500 mb-6 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <Badge className={`
+              ${market.status === 'WAITING_PLAYERS' ? 'bg-yellow-500' : ''}
+              ${market.status === 'ACTIVE' ? 'bg-green-500' : ''}
+              ${market.status === 'RESOLVED' ? 'bg-blue-500' : ''}
+            `}>
+              {market.status}
+            </Badge>
+            <div className="flex items-center gap-4 text-purple-300">
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                <span className="text-sm">{currentPlayers}/{playerLimit} Players</span>
+              </div>
+            </div>
           </div>
 
-          {/* Betting Sidebar */}
-          <div className="space-y-6">
-            <Card className="p-6 sticky top-24 bg-gradient-to-b from-card to-secondary/20">
-              <h3 className="text-xl font-bungee mb-6">Place Your Bet</h3>
+          <h1 className="text-3xl font-bold text-white mb-4">{market.question}</h1>
 
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="text-sm text-muted-foreground mb-2 block">
-                    Betting on: <span className="font-bold text-klash">{selectedSide.toUpperCase()}</span>
-                  </label>
-                </div>
+          {market.metadata?.tweetUrl && (
+            <a
+              href={market.metadata.tweetUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-300 hover:text-purple-100 text-sm flex items-center gap-2 mb-4"
+            >
+              <MessageSquare className="h-4 w-4" />
+              View Original Tweet
+            </a>
+          )}
 
-                <div>
-                  <label className="text-sm text-muted-foreground mb-2 block">Amount (USDC)</label>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    value={betAmount}
-                    onChange={(e) => setBetAmount(e.target.value)}
-                    className="text-2xl font-bold h-14 bg-background"
-                  />
-                </div>
+          {market.metadata?.description && (
+            <p className="text-purple-200 mb-4">{market.metadata.description}</p>
+          )}
+        </Card>
 
-                <div className="flex gap-2">
-                  {["10", "50", "100", "500"].map((amount) => (
-                    <Button
-                      key={amount}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setBetAmount(amount)}
-                      className="flex-1"
-                    >
-                      ${amount}
-                    </Button>
-                  ))}
-                </div>
+        {/* Betting Interface */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Card className="bg-purple-900/50 border-purple-500 p-6">
+              <h2 className="text-xl font-bold text-white mb-4">Place Your Bet</h2>
+
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <button
+                  onClick={() => setSelectedSide("yes")}
+                  className={`p-4 rounded-lg border-2 transition-all ${selectedSide === "yes"
+                      ? "border-green-500 bg-green-500/20"
+                      : "border-purple-500 hover:border-green-500/50"
+                    }`}
+                >
+                  <div className="text-white font-bold mb-2">YES</div>
+                  <div className="text-purple-300 text-sm">{yesPercentage.toFixed(1)}%</div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedSide("no")}
+                  className={`p-4 rounded-lg border-2 transition-all ${selectedSide === "no"
+                      ? "border-red-500 bg-red-500/20"
+                      : "border-purple-500 hover:border-red-500/50"
+                    }`}
+                >
+                  <div className="text-white font-bold mb-2">NO</div>
+                  <div className="text-purple-300 text-sm">{(100 - yesPercentage).toFixed(1)}%</div>
+                </button>
               </div>
 
-              <div className="bg-secondary/50 rounded-lg p-4 mb-6 border border-border">
-                <div className="flex justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Potential Win</span>
-                  <span className="font-bold text-lg text-klash">${potentialWin}</span>
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Current Odds</span>
-                  <span>{selectedSide === "yes" ? oddsA : oddsB}%</span>
-                </div>
+              <div className="mb-4">
+                <label className="text-purple-300 text-sm mb-2 block">Bet Amount (APT)</label>
+                <Input
+                  type="number"
+                  value={betAmount}
+                  onChange={(e) => setBetAmount(e.target.value)}
+                  placeholder="0.0"
+                  className="bg-purple-950 border-purple-500 text-white"
+                  disabled={!walletAddress || market.status !== 'WAITING_PLAYERS'}
+                />
               </div>
 
               <Button
-                className="w-full h-14 text-lg font-bold bg-gradient-klash shadow-glow animate-glow-pulse"
-                onClick={handlePlaceBet}
-                disabled={placingBet || !betAmount}
+                onClick={handlePlaceBetClick}
+                disabled={!walletAddress || placingBet || market.status !== 'WAITING_PLAYERS'}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
               >
                 {placingBet ? "Placing Bet..." : "Place Bet"}
               </Button>
-            </Card>
 
-            {/* Recent Activity */}
-            <Card className="p-6">
-              <h3 className="text-lg font-bungee mb-4">Recent Activity</h3>
-              <div className="space-y-3">
-                {recentActivity.map((activity, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{activity.avatar}</span>
-                      <div>
-                        <div className="font-mono text-xs text-muted-foreground">{activity.user}</div>
-                        <div className="flex items-center gap-1">
-                          <Badge
-                            variant={activity.side === "YES" ? "default" : "outline"}
-                            className={activity.side === "YES" ? "bg-klash-red text-white" : ""}
-                          >
-                            {activity.side}
-                          </Badge>
-                          <span className="font-bold">{activity.amount}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground">{activity.time}</span>
+              {market.status !== 'WAITING_PLAYERS' && (
+                <p className="text-yellow-400 text-sm mt-2 text-center">
+                  Market is {market.status.toLowerCase()}. Betting is closed.
+                </p>
+              )}
+            </Card>
+          </div>
+
+          <div>
+            <Card className="bg-purple-900/50 border-purple-500 p-6">
+              <h3 className="text-white font-bold mb-4">Market Stats</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-purple-300">Total Pool</span>
+                    <span className="text-white font-bold">{totalPool} APT</span>
                   </div>
-                ))}
+                  <Progress value={100} className="h-2" />
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-purple-300">Platform Fee</span>
+                    <span className="text-white">{market.platformFeePercent || 2}%</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-purple-300">Current Players</span>
+                    <span className="text-white">{currentPlayers}/{playerLimit}</span>
+                  </div>
+                  <Progress value={(currentPlayers / playerLimit) * 100} className="h-2" />
+                </div>
+
+                {market.status === 'RESOLVED' && market.winningOutcome !== undefined && (
+                  <div className="bg-green-500/20 border border-green-500 rounded-lg p-4 mt-4">
+                    <p className="text-green-400 font-bold text-center">
+                      Winner: {market.outcomes[market.winningOutcome]}
+                    </p>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
         </div>
       </div>
+
+      <PlayerCountModal
+        isOpen={showPlayerModal}
+        onClose={() => setShowPlayerModal(false)}
+        onSelectPlayerCount={handlePlayerCountSelected}
+        currentPlayerCount={currentPlayers}
+      />
     </div>
   );
 };

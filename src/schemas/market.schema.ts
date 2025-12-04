@@ -24,10 +24,30 @@ export class Market {
     originalTweetAuthor: string;
 
     @Prop({
-        enum: ['OPEN', 'CLOSED', 'RESOLVED', 'CANCELLED'],
-        default: 'OPEN',
+        enum: ['WAITING_PLAYERS', 'ACTIVE', 'CLOSED', 'RESOLVING', 'RESOLVED', 'CANCELLED'],
+        default: 'WAITING_PLAYERS',
     })
     status: string;
+
+    @Prop({
+        enum: ['TWO_PLAYER', 'MULTI_PLAYER'],
+        default: 'TWO_PLAYER',
+    })
+    marketType: string;
+
+    @Prop({ default: 2 })
+    playerLimit: number;
+
+    @Prop({ type: [{ walletAddress: String, outcome: Number, amount: Number, timestamp: Date }], default: [] })
+    currentPlayers: Array<{
+        walletAddress: string;
+        outcome: number;
+        amount: number;
+        timestamp: Date;
+    }>;
+
+    @Prop({ default: 2 })
+    platformFeePercent: number;
 
     @Prop()
     closingTime: Date;

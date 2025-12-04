@@ -1,30 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Market, MarketDocument } from '../schemas/market.schema';
-import { v4 as uuidv4 } from 'uuid';
+import { InMemoryMarketsService, Market } from './in-memory-markets.service';
 
 @Injectable()
 export class MarketsService {
-    constructor(
-        @InjectModel(Market.name) private marketModel: Model<MarketDocument>,
-    ) { }
+    constructor(private readonly inMemoryService: InMemoryMarketsService) { }
 
     async findAll(): Promise<Market[]> {
-        return this.marketModel.find().exec();
+        return this.inMemoryService.findAll();
     }
 
     async findOne(marketId: string): Promise<Market> {
-        return this.marketModel.findOne({ marketId }).exec();
+        return this.inMemoryService.findOne(marketId);
     }
 
     async create(createMarketDto: any): Promise<Market> {
-        const newMarket = new this.marketModel({
-            ...createMarketDto,
-            marketId: uuidv4(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-        return newMarket.save();
+        return this.inMemoryService.create(createMarketDto);
     }
 }
