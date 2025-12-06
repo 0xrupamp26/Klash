@@ -12,7 +12,13 @@ import { MarketsModule } from '../markets/markets.module';
         forwardRef(() => MarketsModule),
     ],
     controllers: [BetsController],
-    providers: [BetsService], // providers will get InMemory services from MarketsModule exports or we should provide them if needed, but MarketsModule exports them.
+    providers: [
+        {
+            provide: BetsService,
+            useClass: InMemoryBetsService,
+        },
+        InMemoryBetsService
+    ],
     exports: [BetsService],
 })
 export class BetsModule { }

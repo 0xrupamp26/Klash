@@ -142,11 +142,31 @@ const MarketDetail = () => {
 
     setPlacingBet(true);
     try {
+      // 1. Create Transaction Payload (Transfer APT to Klash Treasury)
+      // Using a fixed dummy address for demo treasury
+      const treasuryAddress = "0x1";
+      const amountOctas = Math.floor(parseFloat(betAmount) * 100000000); // Convert APT to Octas
+
+      const payload = {
+        type: "entry_function_payload",
+        function: "0x1::coin::transfer",
+        type_arguments: ["0x1::aptos_coin::AptosCoin"],
+        arguments: [treasuryAddress, amountOctas.toString()],
+      };
+
+      // 2. Sign and Submit via Wallet
+      toast.loading("Please sign the transaction in your wallet...");
+      const txHash = await walletService.signAndSubmitTransaction(payload as any);
+      toast.dismiss();
+      toast.success("Transaction submitted!", { description: `Hash: ${txHash.slice(0, 10)}...` });
+
+      // 3. Call Backend API
       await betApi.placeBet({
         marketId: market.marketId,
         outcome: selectedSide === "yes" ? 0 : 1,
         amount: parseFloat(betAmount),
         walletAddress,
+        transactionHash: txHash, // Send hash to backend
       });
 
       toast.success("Bet placed successfully!");
@@ -223,12 +243,41 @@ const MarketDetail = () => {
           <Card className="bg-purple-900/50 border-purple-500 mb-6 p-4">
             <div className="flex items-center justify-between text-white">
               <div>
-                <p className="text-sm text-purple-300">Wallet Address</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm text-purple-300">Wallet Address</p>
+                  <Badge variant="outline" className="text-green-400 border-green-400 text-xs py-0 h-5">
+                    Aptos Testnet
+                  </Badge>
+                </div>
                 <p className="font-mono text-sm">{walletAddress.slice(0, 8)}...{walletAddress.slice(-6)}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-purple-300">Balance</p>
-                <p className="font-bold">{walletBalance.toFixed(4)} APT</p>
+                <div className="flex items-center gap-2 justify-end">
+                  <p className="font-bold">{walletBalance.toFixed(4)} APT</p>
+                  {walletBalance < 0.1 && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="h-6 text-xs bg-purple-600 hover:bg-purple-700 text-white border-0"
+                      onClick={async () => {
+                        try {
+                          toast.loading("Requesting funds...");
+                          await walletService.fundAccount(walletAddress);
+                          const bal = await walletService.getBalance(walletAddress);
+                          setWalletBalance(bal);
+                          toast.dismiss();
+                          toast.success("Funded 1 APT!");
+                        } catch (e) {
+                          toast.dismiss();
+                          toast.error("Faucet failed. Try again.");
+                        }
+                      }}
+                    >
+                      Get Funds
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </Card>
@@ -392,6 +441,7 @@ const MarketDetail = () => {
         onClose={() => setShowPlayerModal(false)}
         onSelectPlayerCount={handlePlayerCountSelected}
         currentPlayerCount={currentPlayers}
+        loading={placingBet}
       />
     </div>
   );

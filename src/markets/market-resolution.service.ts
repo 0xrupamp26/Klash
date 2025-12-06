@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { InMemoryMarketsService } from './in-memory-markets.service';
 import { InMemoryBetsService } from '../bets/in-memory-bets.service';
 import { MarketGateway } from '../websocket/market.gateway';
@@ -9,6 +9,7 @@ export class MarketResolutionService {
 
     constructor(
         private inMemoryMarketsService: InMemoryMarketsService,
+        @Inject(forwardRef(() => InMemoryBetsService))
         private inMemoryBetsService: InMemoryBetsService,
         private marketGateway: MarketGateway,
     ) { }

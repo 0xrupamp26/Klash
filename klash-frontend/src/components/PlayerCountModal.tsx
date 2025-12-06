@@ -8,6 +8,7 @@ interface PlayerCountModalProps {
     onClose: () => void;
     onSelectPlayerCount: (playerLimit: number) => void;
     currentPlayerCount: number;
+    loading?: boolean;
 }
 
 export const PlayerCountModal: React.FC<PlayerCountModalProps> = ({
@@ -15,6 +16,7 @@ export const PlayerCountModal: React.FC<PlayerCountModalProps> = ({
     onClose,
     onSelectPlayerCount,
     currentPlayerCount,
+    loading = false,
 }) => {
     const [selectedCount, setSelectedCount] = useState<number>(2);
 
@@ -72,11 +74,11 @@ export const PlayerCountModal: React.FC<PlayerCountModalProps> = ({
                 </div>
 
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={onClose} className="flex-1">
+                    <Button variant="outline" onClick={onClose} className="flex-1" disabled={loading}>
                         Cancel
                     </Button>
-                    <Button onClick={handleConfirm} className="flex-1">
-                        Confirm ({selectedCount} players)
+                    <Button onClick={handleConfirm} className="flex-1" disabled={loading}>
+                        {loading ? "Placing..." : `Confirm (${selectedCount} players)`}
                     </Button>
                 </div>
             </DialogContent>
