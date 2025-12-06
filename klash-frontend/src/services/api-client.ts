@@ -36,6 +36,8 @@ export interface Market {
   uniqueBettors: number;
   createdAt: string;
   updatedAt: string;
+  trending?: boolean;
+  isLive?: boolean;
 }
 
 // Bet types
@@ -80,6 +82,7 @@ class ApiClient {
   private client: AxiosInstance;
 
   constructor() {
+    console.log("ApiClient Base URL:", buildApiUrl(''));
     this.client = axios.create({
       baseURL: buildApiUrl(''),
       timeout: 10000,

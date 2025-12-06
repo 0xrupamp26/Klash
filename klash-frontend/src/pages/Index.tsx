@@ -16,9 +16,14 @@ const Index = () => {
   useEffect(() => {
     const fetchMarkets = async () => {
       try {
+        console.log("Fetching markets...");
         const response = await marketApi.getMarkets();
+        console.log("Markets API Response:", response);
         if (response.success && response.data) {
+          console.log("Setting markets state with:", response.data);
           setMarkets(response.data);
+        } else {
+          console.error("Market response unsuccessful or no data:", response);
         }
       } catch (error) {
         console.error('Error fetching markets:', error);
@@ -98,38 +103,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Controversies */}
-      <section className="container py-12 space-y-8">
-        <div className="animate-fade-in">
-          <FeaturedMarketCard
-            title="How Many Racist Comments Will This Tweet Get in 6 Hours?"
-            tweetEmbedCode='<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Argentina I&#39;m in you <br><br>Frens let&#39;s connect before <a href="https://twitter.com/EFDevcon?ref_src=twsrc%5Etfw">@EFDevcon</a> <a href="https://t.co/FHxhVTPZbb">pic.twitter.com/FHxhVTPZbb</a></p>&mdash; Thiru.eth ✈️ Devconnect 🇦🇷 (@0xThiru) <a href="https://twitter.com/0xThiru/status/1989066151515865401?ref_src=twsrc%5Etfw">November 13, 2025</a></blockquote>'
-            endsIn="5h 42m"
-            totalPool="$89.5K"
-            options={[
-              { range: "0-10", odds: 1.2, pool: 45000 },
-              { range: "11-50", odds: 2.5, pool: 28000 },
-              { range: "51-100", odds: 4.8, pool: 12000 },
-              { range: "100+", odds: 8.5, pool: 4500 },
-            ]}
-          />
-        </div>
-
-        <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-          <FeaturedMarketCard
-            title="How Many Days Will This Be Alive on the Algorithm?"
-            tweetEmbedCode='<blockquote class="twitter-tweet" data-media-max-width="560"><p lang="en" dir="ltr">Makeup ate today <a href="https://t.co/NZ5UFAXxf8">pic.twitter.com/NZ5UFAXxf8</a></p>&mdash; bud wiser (@w0rdgenerator) <a href="https://twitter.com/w0rdgenerator/status/1984987985696408026?ref_src=twsrc%5Etfw">November 2, 2025</a></blockquote>'
-            endsIn="48h"
-            totalPool="$156.3K"
-            options={[
-              { range: "1-3 Days", odds: 2.1, pool: 62000 },
-              { range: "4-7 Days", odds: 3.5, pool: 48000 },
-              { range: "8-14 Days", odds: 5.2, pool: 32000 },
-              { range: "15+ Days", odds: 9.8, pool: 14300 },
-            ]}
-          />
-        </div>
-      </section>
+      {/* Featured Controversies Section Removed to show dynamic content better */}
 
       {/* Other Markets Section */}
       <section className="container py-12">
@@ -155,8 +129,8 @@ const Index = () => {
 
           <TabsContent value="trending" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {displayMarkets.filter(m => m.trending).map((market) => (
-                <MarketCard key={market.id} {...market} />
+              {displayMarkets.map((market) => (
+                <MarketCard key={market.id || market.marketId} {...market} />
               ))}
             </div>
           </TabsContent>

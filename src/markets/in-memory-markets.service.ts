@@ -37,6 +37,8 @@ export interface Market {
     };
     totalBets: number;
     uniqueBettors: number;
+    trending?: boolean;
+    isLive?: boolean;
 }
 
 @Injectable()
@@ -74,7 +76,9 @@ export class InMemoryMarketsService {
                 embedHtml: `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">One of the worst events I have ever attended in my 6 years in crypto.<a href="https://twitter.com/BasedIndia?ref_src=twsrc%5Etfw">@BasedIndia</a> and the team are clearly working based on “favouritism.”<br><br>&gt; Hosted a side event at <a href="https://twitter.com/IBWofficial?ref_src=twsrc%5Etfw">@IBWofficial</a><br>&gt; Asked people without tickets to wait for an hour<br>&gt; After an hour told people, “Hey, we aren’t… <a href="https://t.co/tIBogfxbyG">pic.twitter.com/tIBogfxbyG</a></p>&mdash; ₿🧞‍♂️ (@BR4ted) <a href="https://twitter.com/BR4ted/status/1995887135661126136?ref_src=twsrc%5Etfw">December 2, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`
             },
             totalBets: 0,
-            uniqueBettors: 0
+            uniqueBettors: 0,
+            trending: true,
+            isLive: true
         };
 
         this.markets.set(market.marketId, market);
@@ -111,7 +115,9 @@ export class InMemoryMarketsService {
                 createdBy: 'USER'
             },
             totalBets: marketData.totalBets || 0,
-            uniqueBettors: marketData.uniqueBettors || 0
+            uniqueBettors: marketData.uniqueBettors || 0,
+            trending: marketData.trending || false,
+            isLive: marketData.isLive || true
         };
 
         this.markets.set(market.marketId, market);
