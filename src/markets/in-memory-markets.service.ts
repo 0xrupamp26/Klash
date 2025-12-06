@@ -51,8 +51,10 @@ export class InMemoryMarketsService {
     }
 
     private seedMarket() {
+        // Fixed UUID for demo consistency - Prevents "Market Not Found" after restart
+        const marketId = '12345678-1234-1234-1234-1234567890ab';
         const market: Market = {
-            marketId: uuidv4(),
+            marketId: marketId,
             question: 'Did Based India’s IBW side event cross the line into unfair ‘favouritism’ toward friends and influencers?',
             outcomes: ['Yes', 'No'],
             originalTweetId: '1995887135661126136',
