@@ -6,6 +6,7 @@ import { TrendingUp, TrendingDown, Clock, CheckCircle, XCircle } from "lucide-re
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { betApi } from "@/services/api-client";
+import { walletService } from "@/services/wallet-service";
 
 const Portfolio = () => {
   const [activeBets, setActiveBets] = useState<any[]>([]);
@@ -25,8 +26,13 @@ const Portfolio = () => {
   useEffect(() => {
     const fetchBets = async () => {
       try {
-        // Mock wallet address for now
-        const walletAddress = "0x123...mock";
+        const walletAddress = await walletService.getWalletAddress();
+
+        if (!walletAddress) {
+          setLoading(false);
+          return;
+        }
+
         const response = await betApi.getUserBets(walletAddress);
 
         if (response.success && response.data) {

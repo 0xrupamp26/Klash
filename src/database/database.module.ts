@@ -15,7 +15,7 @@ import { Market, MarketSchema } from '../schemas/market.schema';
         }),
         MongooseModule.forFeature([{ name: Market.name, schema: MarketSchema }]),
     ],
-    providers: [SeedService],
+    providers: [],
     exports: [MongooseModule],
 })
 export class DatabaseModule { }

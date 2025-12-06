@@ -39,7 +39,22 @@ const MarketDetail = () => {
       }
     };
     fetchMarket();
+    fetchMarket();
   }, [id]);
+
+  // Load Twitter Widget Script
+  useEffect(() => {
+    if (market?.metadata?.embedHtml) {
+      const script = document.createElement('script');
+      script.src = "https://platform.twitter.com/widgets.js";
+      script.async = true;
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      }
+    }
+  }, [market]);
 
   // WebSocket integration
   useEffect(() => {
@@ -222,9 +237,26 @@ const MarketDetail = () => {
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-white mb-4">{market.question}</h1>
+          {market.metadata?.embedHtml ? (
+            <div className="mb-6 flex justify-center">
+              <div dangerouslySetInnerHTML={{ __html: market.metadata.embedHtml }} />
+            </div>
+          ) : (
+            <h1 className="text-3xl font-bold text-white mb-4">{market.question}</h1>
+          )}
 
-          {market.metadata?.tweetUrl && (
+          {/* Fallback Question Display if embed is present but we still want to show the question clearly above/below if needed, 
+              but user asked to replace content with blockquote. 
+              Let's keep question as title if not embedded, or maybe above embed? 
+              User said: "replace the current frontend markets and replace with [tweet] with the question [Question] under which..."
+              So: Question -> Tweet -> Betting Interface.
+          */}
+
+          {market.metadata?.embedHtml && (
+            <h1 className="text-2xl font-bold text-white mb-4 text-center">{market.question}</h1>
+          )}
+
+          {market.metadata?.tweetUrl && !market.metadata?.embedHtml && (
             <a
               href={market.metadata.tweetUrl}
               target="_blank"
@@ -237,7 +269,7 @@ const MarketDetail = () => {
           )}
 
           {market.metadata?.description && (
-            <p className="text-purple-200 mb-4">{market.metadata.description}</p>
+            <p className="text-purple-200 mb-4 text-center">{market.metadata.description}</p>
           )}
         </Card>
 
@@ -251,8 +283,8 @@ const MarketDetail = () => {
                 <button
                   onClick={() => setSelectedSide("yes")}
                   className={`p-4 rounded-lg border-2 transition-all ${selectedSide === "yes"
-                      ? "border-green-500 bg-green-500/20"
-                      : "border-purple-500 hover:border-green-500/50"
+                    ? "border-green-500 bg-green-500/20"
+                    : "border-purple-500 hover:border-green-500/50"
                     }`}
                 >
                   <div className="text-white font-bold mb-2">YES</div>
@@ -262,8 +294,8 @@ const MarketDetail = () => {
                 <button
                   onClick={() => setSelectedSide("no")}
                   className={`p-4 rounded-lg border-2 transition-all ${selectedSide === "no"
-                      ? "border-red-500 bg-red-500/20"
-                      : "border-purple-500 hover:border-red-500/50"
+                    ? "border-red-500 bg-red-500/20"
+                    : "border-purple-500 hover:border-red-500/50"
                     }`}
                 >
                   <div className="text-white font-bold mb-2">NO</div>

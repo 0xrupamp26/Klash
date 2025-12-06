@@ -51,6 +51,8 @@ export class MarketResolutionService {
         market.status = 'RESOLVING';
         await this.inMemoryMarketsService.update(market.marketId, market);
 
+        // Deterministic resolution for demo: If "Yes" wins, outcome 0. If "No" wins, outcome 1.
+        // For simulation, let's randomize it just like before.
         const winningOutcome = Math.random() < 0.5 ? 0 : 1;
 
         const bets = await this.inMemoryBetsService.findByMarket(marketId);
@@ -68,7 +70,9 @@ export class MarketResolutionService {
             await this.inMemoryBetsService.update(bet.betId, {
                 ...bet,
                 status: 'WON',
-                payout: payoutPerWinner
+                payout: payoutPerWinner,
+                profit: payoutPerWinner - bet.amount,
+                resolvedAt: new Date(),
             });
         }
 
@@ -76,12 +80,15 @@ export class MarketResolutionService {
             await this.inMemoryBetsService.update(bet.betId, {
                 ...bet,
                 status: 'LOST',
-                payout: 0
+                payout: 0,
+                profit: -bet.amount,
+                resolvedAt: new Date(),
             });
         }
 
         market.status = 'RESOLVED';
         market.winningOutcome = winningOutcome;
+        market.resolutionTime = new Date();
         await this.inMemoryMarketsService.update(market.marketId, market);
 
         this.logger.log(

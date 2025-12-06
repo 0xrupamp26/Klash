@@ -19,14 +19,22 @@ export class WalletService {
      * In production, use Petra wallet extension
      */
     async connectWallet(): Promise<string> {
-        // For demo: create a new account
-        this.account = new AptosAccount();
-        const address = this.account.address().hex();
+        // Check for Petra Wallet
+        const isPetraInstalled = (window as any).aptos;
+        if (!isPetraInstalled) {
+            window.open('https://petra.app/', '_blank');
+            throw new Error('Petra Wallet not installed');
+        }
 
-        // Fund the account from faucet
-        await this.fundAccount(address);
-
-        return address;
+        try {
+            const response = await (window as any).aptos.connect();
+            const account = await (window as any).aptos.account();
+            this.account = account; // Store locally if needed, but mainly relying on window.aptos
+            return account.address;
+        } catch (error) {
+            console.error('User rejected connection', error);
+            throw error;
+        }
     }
 
     /**
@@ -51,6 +59,8 @@ export class WalletService {
         if (!addr) throw new Error('No wallet connected');
 
         try {
+            // If using Petra, we can just use the provided client or fetch resources
+            // But relying on NODE_URL is fine for fetching balance of any address
             const resources = await this.client.getAccountResources(addr);
             const accountResource = resources.find(
                 (r) => r.type === '0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>'
@@ -87,9 +97,23 @@ export class WalletService {
      * Sign and submit transaction
      */
     async signAndSubmitTransaction(payload: Types.TransactionPayload): Promise<string> {
+        // Use Petra
+        if ((window as any).aptos) {
+            try {
+                const pendingTransaction = await (window as any).aptos.signAndSubmitTransaction(payload);
+                await this.client.waitForTransaction(pendingTransaction.hash);
+                return pendingTransaction.hash;
+            } catch (error) {
+                console.error('Petra transaction failed', error);
+                throw error;
+            }
+        }
+
+        // Fallback or Error
         if (!this.account) throw new Error('No wallet connected');
 
         try {
+            // ... existing fallback code ...
             const txnRequest = await this.client.generateTransaction(
                 this.account.address(),
                 payload

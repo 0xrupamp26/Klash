@@ -33,6 +33,7 @@ export interface Market {
         createdBy: string;
         tweetUrl?: string;
         description?: string;
+        embedHtml?: string;
     };
     totalBets: number;
     uniqueBettors: number;
@@ -50,7 +51,7 @@ export class InMemoryMarketsService {
     private seedMarket() {
         const market: Market = {
             marketId: uuidv4(),
-            question: 'Will this controversial tweet spark a major debate?',
+            question: 'Did Based India’s IBW side event cross the line into unfair ‘favouritism’ toward friends and influencers?',
             outcomes: ['Yes', 'No'],
             originalTweetId: '1995887135661126136',
             originalTweetText: 'Controversial content from @BR4ted',
@@ -68,8 +69,9 @@ export class InMemoryMarketsService {
                 tags: ['twitter', 'controversy', 'debate'],
                 controversyScore: 0.95,
                 createdBy: 'SEED',
-                tweetUrl: 'https://x.com/BR4ted/status/1995887135661126136?s=20',
-                description: 'Based on the controversial tweet from @BR4ted. Will this spark a major debate in the community?'
+                tweetUrl: 'https://twitter.com/BR4ted/status/1995887135661126136',
+                description: 'Based on the controversial tweet from @BR4ted about IBW side event favouritism.',
+                embedHtml: `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">One of the worst events I have ever attended in my 6 years in crypto.<a href="https://twitter.com/BasedIndia?ref_src=twsrc%5Etfw">@BasedIndia</a> and the team are clearly working based on “favouritism.”<br><br>&gt; Hosted a side event at <a href="https://twitter.com/IBWofficial?ref_src=twsrc%5Etfw">@IBWofficial</a><br>&gt; Asked people without tickets to wait for an hour<br>&gt; After an hour told people, “Hey, we aren’t… <a href="https://t.co/tIBogfxbyG">pic.twitter.com/tIBogfxbyG</a></p>&mdash; ₿🧞‍♂️ (@BR4ted) <a href="https://twitter.com/BR4ted/status/1995887135661126136?ref_src=twsrc%5Etfw">December 2, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`
             },
             totalBets: 0,
             uniqueBettors: 0

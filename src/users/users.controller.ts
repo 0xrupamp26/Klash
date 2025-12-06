@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '../schemas/user.schema';
 import { BetsService } from '../bets/bets.service';
-import { Bet } from '../schemas/bet.schema';
+import { Bet } from '../bets/in-memory-bets.service';
 
 @Controller('users')
 export class UsersController {

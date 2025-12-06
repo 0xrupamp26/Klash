@@ -78,6 +78,8 @@ export class Market {
             tags: [String],
             controversyScore: Number,
             createdBy: String,
+            tweetUrl: String,
+            description: String,
         },
         default: {},
     })
@@ -86,6 +88,8 @@ export class Market {
         tags: string[];
         controversyScore: number;
         createdBy: string;
+        tweetUrl?: string;
+        description?: string;
     };
 
     @Prop({ default: 0 })

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
 import { BetsService } from './bets.service';
-import { Bet } from '../schemas/bet.schema';
+import { Bet } from './in-memory-bets.service';
 
 @Controller('bets')
 export class BetsController {

@@ -58,6 +58,7 @@ export class BetsService {
             odds: poolRatio,
             status: 'PENDING',
             timestamp: new Date(),
+            walletAddress: placeBetDto.walletAddress,
         });
 
         // Update market pools

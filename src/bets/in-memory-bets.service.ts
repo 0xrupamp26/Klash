@@ -11,6 +11,11 @@ export interface Bet {
     status: string;
     payout?: number;
     timestamp: Date;
+    walletAddress?: string;
+    profit?: number;
+    transactionHash?: string;
+    resolvedAt?: Date;
+    paidAt?: Date;
 }
 
 @Injectable()
@@ -43,7 +48,11 @@ export class InMemoryBetsService {
             odds: betData.odds || 1,
             status: betData.status || 'PENDING',
             payout: betData.payout,
-            timestamp: betData.timestamp || new Date()
+            timestamp: betData.timestamp || new Date(),
+            walletAddress: betData.walletAddress, // Ensure this is preserved
+            transactionHash: betData.transactionHash,
+            resolvedAt: betData.resolvedAt,
+            paidAt: betData.paidAt
         };
 
         this.bets.set(bet.betId, bet);

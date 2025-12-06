@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
 import { MarketsService } from './markets.service';
-import { Market } from '../schemas/market.schema';
+import { Market } from './in-memory-markets.service';
 import { BetsService } from '../bets/bets.service';
-import { Bet } from '../schemas/bet.schema';
+import { Bet } from '../bets/in-memory-bets.service';
 
 @Controller('markets')
 export class MarketsController {

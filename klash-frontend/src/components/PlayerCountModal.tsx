@@ -27,7 +27,7 @@ export const PlayerCountModal: React.FC<PlayerCountModalProps> = ({
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Choose Player Count</DialogTitle>
+                    <DialogTitle>Do you want to play this market on 2 people?</DialogTitle>
                     <DialogDescription>
                         Select how many players can participate in this market
                     </DialogDescription>
@@ -42,8 +42,8 @@ export const PlayerCountModal: React.FC<PlayerCountModalProps> = ({
                         <button
                             onClick={() => setSelectedCount(2)}
                             className={`p-6 border-2 rounded-lg flex flex-col items-center justify-center gap-2 transition-all ${selectedCount === 2
-                                    ? 'border-purple-500 bg-purple-50'
-                                    : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-purple-500 bg-purple-50'
+                                : 'border-gray-200 hover:border-gray-300'
                                 }`}
                         >
                             <User className="w-8 h-8" />
@@ -54,8 +54,8 @@ export const PlayerCountModal: React.FC<PlayerCountModalProps> = ({
                         <button
                             onClick={() => setSelectedCount(10)}
                             className={`p-6 border-2 rounded-lg flex flex-col items-center justify-center gap-2 transition-all ${selectedCount === 10
-                                    ? 'border-purple-500 bg-purple-50'
-                                    : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-purple-500 bg-purple-50'
+                                : 'border-gray-200 hover:border-gray-300'
                                 }`}
                         >
                             <Users className="w-8 h-8" />
