@@ -101,9 +101,24 @@ const MarketDetail = () => {
     try {
       const address = await walletService.connectWallet();
       setWalletAddress(address);
-      const balance = await walletService.getBalance();
+      let balance = await walletService.getBalance(address);
+
+      // Auto-fund if balance is 0 (Demo User Experience)
+      if (balance <= 0) {
+        toast.info("Balance is 0. Requesting Testnet Faucet...");
+        try {
+          await walletService.fundAccount(address);
+          balance = await walletService.getBalance(address);
+          toast.success("Wallet Funded with 1 APT!");
+        } catch (e) {
+          console.error("Faucet failed", e);
+          toast.error("Could not fund wallet. Please use official faucet.");
+        }
+      } else {
+        toast.success(`Wallet connected! Balance: ${balance} APT`);
+      }
+
       setWalletBalance(balance);
-      toast.success("Wallet connected! Funded with 1 APT from faucet");
     } catch (error) {
       console.error('Error connecting wallet:', error);
       toast.error("Failed to connect wallet");

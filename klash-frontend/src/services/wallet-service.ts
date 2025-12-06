@@ -100,7 +100,7 @@ export class WalletService {
         // Use Petra
         if ((window as any).aptos) {
             try {
-                const pendingTransaction = await (window as any).aptos.signAndSubmitTransaction(payload);
+                const pendingTransaction = await (window as any).aptos.signAndSubmitTransaction(payload as any);
                 await this.client.waitForTransaction(pendingTransaction.hash);
                 return pendingTransaction.hash;
             } catch (error) {

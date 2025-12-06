@@ -35,7 +35,7 @@ export class MarketResolutionService {
                 message: 'Market is now active! All players have joined.',
             });
 
-            setTimeout(() => this.resolveMarket(marketId), 30000);
+            setTimeout(() => this.resolveMarket(marketId), 10000);
         }
     }
 
