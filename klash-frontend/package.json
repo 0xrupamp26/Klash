@@ -11,6 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aptos-labs/wallet-adapter-ant-design": "^5.3.5",
+    "@aptos-labs/wallet-adapter-react": "^7.2.5",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -40,6 +42,7 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-query": "^5.83.0",
+    "@thalalabs/surf": "^1.9.7",
     "@web3modal/wagmi": "^5.1.11",
     "aptos": "^1.22.1",
     "class-variance-authority": "^0.7.1",
@@ -50,6 +53,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
+    "petra-plugin-wallet-adapter": "^0.4.5",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",

@@ -19,21 +19,22 @@ export class WalletService {
      * In production, use Petra wallet extension
      */
     async connectWallet(): Promise<string> {
-        // Check for Petra Wallet
-        const isPetraInstalled = (window as any).aptos;
-        if (!isPetraInstalled) {
+        if (typeof window !== 'undefined' && (window as any).aptos) {
+            try {
+                const response = await (window as any).aptos.connect();
+                // Petra standard response usually includes address
+                // Fallback to account() if needed, but connect() is preferred entry
+                const address = response.address || (await (window as any).aptos.account()).address;
+
+                this.account = { text: address }; // minimal mock
+                return address;
+            } catch (error) {
+                console.error('Wallet connection failed', error);
+                throw error;
+            }
+        } else {
             window.open('https://petra.app/', '_blank');
             throw new Error('Petra Wallet not installed');
-        }
-
-        try {
-            const response = await (window as any).aptos.connect();
-            const account = await (window as any).aptos.account();
-            this.account = account; // Store locally if needed, but mainly relying on window.aptos
-            return account.address;
-        } catch (error) {
-            console.error('User rejected connection', error);
-            throw error;
         }
     }
 

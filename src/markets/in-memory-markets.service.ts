@@ -51,39 +51,42 @@ export class InMemoryMarketsService {
     }
 
     private seedMarket() {
-        // Fixed UUID for demo consistency - Prevents "Market Not Found" after restart
-        const marketId = '12345678-1234-1234-1234-1234567890ab';
-        const market: Market = {
-            marketId: marketId,
-            question: 'Did Based India’s IBW side event cross the line into unfair ‘favouritism’ toward friends and influencers?',
-            outcomes: ['Yes', 'No'],
-            originalTweetId: '1995887135661126136',
-            originalTweetText: 'Controversial content from @BR4ted',
-            originalTweetAuthor: 'BR4ted',
-            status: 'WAITING_PLAYERS',
-            marketType: 'TWO_PLAYER',
-            playerLimit: 2,
-            closingTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            resolutionTime: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000),
-            pools: { total: 0, outcomeA: 0, outcomeB: 0 },
-            platformFeePercent: 2,
-            currentPlayers: [],
-            metadata: {
-                category: 'Social',
-                tags: ['twitter', 'controversy', 'debate'],
-                controversyScore: 0.95,
-                createdBy: 'SEED',
-                tweetUrl: 'https://twitter.com/BR4ted/status/1995887135661126136',
-                description: 'Based on the controversial tweet from @BR4ted about IBW side event favouritism.',
-                embedHtml: `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">One of the worst events I have ever attended in my 6 years in crypto.<a href="https://twitter.com/BasedIndia?ref_src=twsrc%5Etfw">@BasedIndia</a> and the team are clearly working based on “favouritism.”<br><br>&gt; Hosted a side event at <a href="https://twitter.com/IBWofficial?ref_src=twsrc%5Etfw">@IBWofficial</a><br>&gt; Asked people without tickets to wait for an hour<br>&gt; After an hour told people, “Hey, we aren’t… <a href="https://t.co/tIBogfxbyG">pic.twitter.com/tIBogfxbyG</a></p>&mdash; ₿🧞‍♂️ (@BR4ted) <a href="https://twitter.com/BR4ted/status/1995887135661126136?ref_src=twsrc%5Etfw">December 2, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`
-            },
-            totalBets: 0,
-            uniqueBettors: 0,
-            trending: true,
-            isLive: true
-        };
+        // Load controversies from JSON
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const controversies = require('../../config/controversies.json');
 
-        this.markets.set(market.marketId, market);
+        controversies.forEach((c: any) => {
+            const market: Market = {
+                marketId: c.id,
+                question: c.title,
+                outcomes: [c.sideA, c.sideB],
+                originalTweetId: c.tweetUrl ? c.tweetUrl.split('/').pop() : '0',
+                status: 'WAITING_PLAYERS', // Open for bets
+                marketType: 'TWO_PLAYER',
+                playerLimit: 2,
+                closingTime: new Date(c.closeTime),
+                resolutionTime: new Date(new Date(c.closeTime).getTime() + 24 * 60 * 60 * 1000),
+                pools: { total: 0, outcomeA: 0, outcomeB: 0 },
+                platformFeePercent: 2,
+                currentPlayers: [],
+                metadata: {
+                    category: c.category || 'General',
+                    tags: ['alpha'],
+                    controversyScore: 0.9,
+                    createdBy: 'SYSTEM',
+                    tweetUrl: c.tweetUrl,
+                    description: c.description,
+                    embedHtml: c.embedHtml
+                },
+                totalBets: 0,
+                uniqueBettors: 0,
+                trending: true,
+                isLive: true
+            };
+            this.markets.set(market.marketId, market);
+        });
+
+        console.log(`Seeded ${this.markets.size} alpha markets.`);
     }
 
     async findAll(): Promise<Market[]> {

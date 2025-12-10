@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aptos-labs/wallet-adapter-react": "^7.2.5",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -31,6 +32,7 @@
     "@nestjs/schedule": "^6.0.1",
     "@nestjs/swagger": "^11.2.1",
     "@nestjs/websockets": "^11.1.9",
+    "@okxconnect/aptos-provider": "^1.9.1",
     "@types/axios": "^0.9.36",
     "@types/python-shell": "^0.4.2",
     "aptos": "^1.22.1",

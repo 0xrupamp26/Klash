@@ -8,25 +8,26 @@ export class BetsController {
 
     @Post()
     async placeBet(
-        @Post()
-        async placeBet(
-            @Body() placeBetDto: { marketId: string; outcome: number; amount: number; walletAddress: string; transactionHash ?: string },
-    ): Promise < Bet > {
+        @Body() placeBetDto: { marketId: string; outcome: number; amount: number; walletAddress: string; transactionHash?: string },
     ): Promise<Bet> {
         return this.betsService.placeBet(placeBetDto);
     }
 
     @Get('user/:userId')
-async getUserBets(@Param('userId') userId: string): Promise < Bet[] > {
-    return this.betsService.getUserBets(userId);
-}
-
-@Get(':id')
-async findOne(@Param('id') id: string): Promise < Bet > {
-    const bet = await this.betsService.findOne(id);
-    if(!bet) {
-        throw new NotFoundException(`Bet with ID ${id} not found`);
+    async getUserBets(@Param('userId') userId: string): Promise<Bet[]> {
+        return this.betsService.getUserBets(userId);
     }
+
+    @Get(':id')
+    async findOne(@Param('id') id: string): Promise<Bet> {
+        const bet = await this.betsService.findOne(id);
+        if (!bet) {
+            throw new NotFoundException(`Bet with ID ${id} not found`);
+        }
         return bet;
-}
+    }
+    @Get('portfolio/:wallet')
+    async getPortfolio(@Param('wallet') wallet: string) {
+        return this.betsService.getPortfolio(wallet);
+    }
 }

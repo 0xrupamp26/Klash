@@ -9,23 +9,30 @@ import Portfolio from "./pages/Portfolio";
 import CreateMarket from "./pages/CreateMarket";
 import NotFound from "./pages/NotFound";
 
+import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
+
+// Removed incompatible Petra plugin; utilizing standard detection
+const wallets: any[] = [];
+
 const App = () => (
-  <Web3Provider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/market/:id" element={<MarketDetail />} />
-          <Route path="/portfolio" element={<Portfolio />} />
-          <Route path="/create-market" element={<CreateMarket />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </Web3Provider>
+  <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
+    <Web3Provider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/market/:id" element={<MarketDetail />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/create-market" element={<CreateMarket />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </Web3Provider>
+  </AptosWalletAdapterProvider>
 );
 
 export default App;
