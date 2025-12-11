@@ -1,0 +1,45 @@
+name: Tag from release
+on:
+  push:
+    branches: [ release ]
+
+concurrency:
+  group: tag-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    name: Auto Tag Release
+    runs-on: warp-ubuntu-2204-x64-4x
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Use the PAT so that pushes from this job can trigger other workflows
+          token: ${{ secrets.CI_PUSH_TOKEN }}
+          fetch-depth: 1
+          fetch-tags: true
+
+      - name: Calculate Tag
+        id: calc
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +'%Y.%m.%d')
+          TIME=$(date -u +'%H%M%S')
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          TAG="v${DATE}-${TIME}+${SHORT_SHA}"
+          if git ls-remote --exit-code --tags origin "${TAG}" >/dev/null; then
+            echo "Tag ${TAG} already exists"; exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Configure git user
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create annotated tag
+        run: |
+          git tag -a "${{ steps.calc.outputs.tag }}" -m "Release ${{ steps.calc.outputs.tag }} from ${GITHUB_SHA}"
+          git push origin "${{ steps.calc.outputs.tag }}"
+

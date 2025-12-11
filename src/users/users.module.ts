@@ -5,17 +5,15 @@ import { InMemoryUsersService } from './in-memory-users.service';
 import { BetsModule } from '../bets/bets.module';
 
 @Module({
-    imports: [
-        BetsModule,
-    ],
-    controllers: [UsersController],
-    providers: [
-        {
-            provide: UsersService,
-            useClass: InMemoryUsersService,
-        },
-        InMemoryUsersService
-    ],
-    exports: [UsersService, InMemoryUsersService],
+  imports: [BetsModule],
+  controllers: [UsersController],
+  providers: [
+    {
+      provide: UsersService,
+      useClass: InMemoryUsersService,
+    },
+    InMemoryUsersService,
+  ],
+  exports: [UsersService, InMemoryUsersService],
 })
-export class UsersModule { }
+export class UsersModule {}

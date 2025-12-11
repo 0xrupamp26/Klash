@@ -5,17 +5,17 @@ import { SeedService } from './seed.service';
 import { Market, MarketSchema } from '../schemas/market.schema';
 
 @Module({
-    imports: [
-        MongooseModule.forRootAsync({
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-                uri: configService.get<string>('MONGO_URI'),
-            }),
-            inject: [ConfigService],
-        }),
-        MongooseModule.forFeature([{ name: Market.name, schema: MarketSchema }]),
-    ],
-    providers: [],
-    exports: [MongooseModule],
+  imports: [
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    MongooseModule.forFeature([{ name: Market.name, schema: MarketSchema }]),
+  ],
+  providers: [],
+  exports: [MongooseModule],
 })
-export class DatabaseModule { }
+export class DatabaseModule {}

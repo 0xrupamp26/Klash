@@ -1,0 +1,53 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+    tags:
+      - v*
+    paths-ignore:
+      - .yarn/versions/**
+  
+jobs:
+  deploy:
+    # only allow one at a time per branch
+    concurrency:
+      group: deploy-${{ github.ref }}
+    uses: ./.github/workflows/deploy-e2b.yml
+    secrets: inherit
+    with:
+      environment: ${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.ref == 'refs/heads/staging' && 'staging' || 'development') }}
+      channel: stable
+
+  notify:
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/staging' }}
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Post to Slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          payload: |
+            {
+              "text": "*Deploy* for `${{ github.repository }}` on `${{ github.ref }}`",
+              "blocks": [
+                { "type": "section",
+                  "text": { "type": "mrkdwn",
+                    "text": "*Deploy* for `${{ github.repository }}` on `${{ github.ref }}`"
+                  }
+                },
+                { "type": "context",
+                  "elements": [
+                    { "type": "mrkdwn",
+                      "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+

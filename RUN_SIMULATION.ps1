@@ -13,7 +13,7 @@ Start-Sleep -Seconds 10
 
 # Step 2: Start Frontend
 Write-Host "Starting Frontend (Port 5173)..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PWD\klash-frontend'; npm run dev"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PWD\klash-frontend\_\apps\web'; npm run dev"
 
 Write-Host "Simulation Started!" -ForegroundColor Green
 Write-Host "------------------------------------------------" -ForegroundColor White

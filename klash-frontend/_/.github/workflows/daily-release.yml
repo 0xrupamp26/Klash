@@ -1,0 +1,49 @@
+name: Reset staging to main (nightly)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 10pm PT
+    - cron: '0 6 * * *'
+
+jobs:
+  cut-staging-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CI_PUSH_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Push reset branch with PAT
+        env:
+          GH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
+        run: |
+          git fetch origin main
+          git checkout staging || git checkout -b staging
+          git reset --hard origin/main
+          git push origin staging --force
+
+      - name: Create daily release PR
+        env:
+          GH_TOKEN: ${{ secrets.CI_PUSH_TOKEN }}
+        run: |
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          PR_TITLE="release: $CURRENT_DATE"
+
+          # Check if PR already exists
+          if gh pr list --base release --head staging --state open --limit 1 | grep -q "staging"; then
+            echo "PR from staging to main already exists, updating title if needed"
+            gh pr edit staging --title "$PR_TITLE" --base release
+          else
+            echo "Creating new PR from staging to release"
+            gh pr create --base release --head staging --title "$PR_TITLE" --body "Daily release for $CURRENT_DATE - staging to release"
+          fi
+

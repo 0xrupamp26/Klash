@@ -6,23 +6,34 @@ import { Bet } from '../bets/in-memory-bets.service';
 
 @Controller('users')
 export class UsersController {
-    constructor(
-        private readonly usersService: UsersService,
-        private readonly betsService: BetsService,
-    ) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly betsService: BetsService,
+  ) {}
 
-    @Post()
-    async create(@Body() createUserDto: { walletAddress: string; username?: string; email?: string }): Promise<User> {
-        return this.usersService.create(createUserDto);
-    }
+  @Post()
+  async create(
+    @Body()
+    createUserDto: {
+      walletAddress: string;
+      username?: string;
+      email?: string;
+    },
+  ): Promise<User> {
+    return this.usersService.create(createUserDto);
+  }
 
-    @Get(':walletAddress')
-    async findByWallet(@Param('walletAddress') walletAddress: string): Promise<User> {
-        return this.usersService.findByWallet(walletAddress);
-    }
+  @Get(':walletAddress')
+  async findByWallet(
+    @Param('walletAddress') walletAddress: string,
+  ): Promise<User> {
+    return this.usersService.findByWallet(walletAddress);
+  }
 
-    @Get(':walletAddress/bets')
-    async getUserBets(@Param('walletAddress') walletAddress: string): Promise<Bet[]> {
-        return this.betsService.getUserBets(walletAddress);
-    }
+  @Get(':walletAddress/bets')
+  async getUserBets(
+    @Param('walletAddress') walletAddress: string,
+  ): Promise<Bet[]> {
+    return this.betsService.getUserBets(walletAddress);
+  }
 }

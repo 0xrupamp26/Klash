@@ -1,33 +1,47 @@
-import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  NotFoundException,
+} from '@nestjs/common';
 import { BetsService } from './bets.service';
 import { Bet } from './in-memory-bets.service';
 
 @Controller('bets')
 export class BetsController {
-    constructor(private readonly betsService: BetsService) { }
+  constructor(private readonly betsService: BetsService) {}
 
-    @Post()
-    async placeBet(
-        @Body() placeBetDto: { marketId: string; outcome: number; amount: number; walletAddress: string; transactionHash?: string },
-    ): Promise<Bet> {
-        return this.betsService.placeBet(placeBetDto);
-    }
+  @Post()
+  async placeBet(
+    @Body()
+    placeBetDto: {
+      marketId: string;
+      outcome: number;
+      amount: number;
+      walletAddress: string;
+      transactionHash?: string;
+    },
+  ): Promise<Bet> {
+    return this.betsService.placeBet(placeBetDto);
+  }
 
-    @Get('user/:userId')
-    async getUserBets(@Param('userId') userId: string): Promise<Bet[]> {
-        return this.betsService.getUserBets(userId);
-    }
+  @Get('user/:userId')
+  async getUserBets(@Param('userId') userId: string): Promise<Bet[]> {
+    return this.betsService.getUserBets(userId);
+  }
 
-    @Get(':id')
-    async findOne(@Param('id') id: string): Promise<Bet> {
-        const bet = await this.betsService.findOne(id);
-        if (!bet) {
-            throw new NotFoundException(`Bet with ID ${id} not found`);
-        }
-        return bet;
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Bet> {
+    const bet = await this.betsService.findOne(id);
+    if (!bet) {
+      throw new NotFoundException(`Bet with ID ${id} not found`);
     }
-    @Get('portfolio/:wallet')
-    async getPortfolio(@Param('wallet') wallet: string) {
-        return this.betsService.getPortfolio(wallet);
-    }
+    return bet;
+  }
+  @Get('portfolio/:wallet')
+  async getPortfolio(@Param('wallet') wallet: string) {
+    return this.betsService.getPortfolio(wallet);
+  }
 }

@@ -8,17 +8,19 @@ import { BetsModule } from '../bets/bets.module';
 import { WebsocketModule } from '../websocket/websocket.module';
 
 @Module({
-    imports: [
-        WebsocketModule,
-        forwardRef(() => BetsModule),
-    ],
-    controllers: [MarketsController],
-    providers: [
-        InMemoryMarketsService,
-        InMemoryBetsService,
-        MarketsService,
-        MarketResolutionService
-    ],
-    exports: [MarketsService, MarketResolutionService, InMemoryMarketsService, InMemoryBetsService],
+  imports: [WebsocketModule, forwardRef(() => BetsModule)],
+  controllers: [MarketsController],
+  providers: [
+    InMemoryMarketsService,
+    InMemoryBetsService,
+    MarketsService,
+    MarketResolutionService,
+  ],
+  exports: [
+    MarketsService,
+    MarketResolutionService,
+    InMemoryMarketsService,
+    InMemoryBetsService,
+  ],
 })
-export class MarketsModule { }
+export class MarketsModule {}

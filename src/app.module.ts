@@ -28,4 +28,4 @@ import { WebsocketModule } from './websocket/websocket.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

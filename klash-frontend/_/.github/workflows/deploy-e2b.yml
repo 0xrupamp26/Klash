@@ -1,0 +1,51 @@
+name: Deploy 
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Select the environment to deploy to (production, staging, development)"
+        type: string
+        required: true
+      channel:
+        description: "Select the release channel (beta, stable)"
+        type: string
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Install E2B CLI
+        shell: bash
+        run: npm i -g @e2b/cli@2.2.9
+
+      - name: Set environment variables
+        shell: bash
+        id: set_env
+        run: |
+          echo "env_name=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          echo "channel=${{ inputs.channel }}" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.environment }}" = "production" ]; then
+            echo "api_key=${{ secrets.E2B_API_KEY_PRODUCTION }}" >> $GITHUB_OUTPUT
+            echo "config=e2b.production.${{ inputs.channel }}.toml" >> $GITHUB_OUTPUT
+            echo "name=create-production-${{ inputs.channel }}" >> $GITHUB_OUTPUT
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            echo "api_key=${{ secrets.E2B_API_KEY_STAGING }}" >> $GITHUB_OUTPUT
+            echo "config=e2b.staging.${{ inputs.channel }}.toml" >> $GITHUB_OUTPUT
+            echo "name=create-staging-${{ inputs.channel }}" >> $GITHUB_OUTPUT
+          else
+            echo "api_key=${{ secrets.E2B_API_KEY_DEVELOPMENT }}" >> $GITHUB_OUTPUT
+            echo "config=e2b.development.${{ inputs.channel }}.toml" >> $GITHUB_OUTPUT
+            echo "name=create-development-${{ inputs.channel }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy
+        run: e2b template build --config ${{ steps.set_env.outputs.config }}
+        shell: bash
+        env:
+          E2B_ACCESS_TOKEN: ${{ steps.set_env.outputs.api_key }}

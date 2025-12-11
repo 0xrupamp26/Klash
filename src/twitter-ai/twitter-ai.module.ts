@@ -7,9 +7,9 @@ import { TwitterAiScheduler } from './twitter-ai.scheduler';
 import { MarketsModule } from '../markets/markets.module';
 
 @Module({
-    imports: [HttpModule, MarketsModule],
-    controllers: [TwitterAiController],
-    providers: [TwitterAiService, TwitterAiScheduler],
-    exports: [TwitterAiService],
+  imports: [HttpModule, MarketsModule],
+  controllers: [TwitterAiController],
+  providers: [TwitterAiService, TwitterAiScheduler],
+  exports: [TwitterAiService],
 })
-export class TwitterAiModule { }
+export class TwitterAiModule {}
